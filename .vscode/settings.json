@@ -1,0 +1,13 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "server": "aws-0-us-west-1.pooler.supabase.com",
+            "port": 5432,
+            "driver": "PostgreSQL",
+            "username": "ffreadonly.aojwofrwvbkplkyfmosi",
+            "database": "postgres",
+            "name": "Superbase Database (Read-only)"
+        }
+    ]
+}
