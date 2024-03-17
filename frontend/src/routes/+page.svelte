@@ -1,27 +1,27 @@
 <!-- https://github.com/consultingninja/svelteTemplateProject/blob/main/src/App.svelte -->
 
 <script>
-import Navbar from "$lib/Navbar.svelte";
-import Footer from "../lib/Footer2.svelte";
-import DashboardCard from "../lib/DashboardCard.svelte";
+  import Navbar from "$lib/Navbar.svelte";
+  import Footer from "../lib/Footer2.svelte";
+  import DashboardCard from "../lib/DashboardCard.svelte";
 
-import { linkUtil } from "../utils/linkUtil";
-import url from "../url";
-// $: console.log($url);
-// console.log(url); // Should log the store, not `undefined`
-import { pageUtil } from "../utils/pageUtil";
-import Page from "../lib/Page.svelte";
+  import { linkUtil } from "../utils/linkUtil";
+  import url from "../url";
+  // $: console.log($url);
+  // console.log(url); // Should log the store, not `undefined`
+  import { pageUtil } from "../utils/pageUtil";
+  import Page from "../lib/Page.svelte";
 
-import { Row, Breadcrumb, BreadcrumbItem } from 'sveltestrap';
+  import { Row, Breadcrumb, BreadcrumbItem } from "@sveltestrap/sveltestrap";
 
-let title = "FF Admin Dashboard"
+  let title = "FF Admin Dashboard";
 
-// Testing communicating with backend
-let rand = -1;
+  // Testing communicating with backend
+  let rand = -1;
   function getRand() {
     fetch("http://127.0.0.1:5000/rand")
-      .then(d => d.text())
-      .then(d => (rand = d));
+      .then((d) => d.text())
+      .then((d) => (rand = d));
   }
 </script>
 
@@ -51,22 +51,6 @@ let rand = -1;
     <DashboardCard cardTitle="Danger Card" cardColor="danger" />
   </div>
 </Row>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 <!-- <Navbar data={linkUtil}/> -->
 <!-- <Navbar2 {segment} {color} {title} />
@@ -112,3 +96,4 @@ let rand = -1;
     }
 
 </style> -->
+
