@@ -1,31 +1,27 @@
 <script>
-  import {
-    Card,
-    CardBody,
-    CardFooter,
-    CardHeader,
-    CardText,
-    CardSubtitle,
-    Table,
-    Row,
-  } from "@sveltestrap/sveltestrap";
-
   export let cardTitle = "";
   export let cardColor;
   export let cardFooterText = "View Details";
+  let className;
+
+  // creates a `class` property, even
+  // though it is a reserved word
+  export { className as class };
 </script>
 
-<Card inverse color={cardColor} class="mb-4">
-  <CardBody>
-    <CardText>{cardTitle}</CardText>
-  </CardBody>
-  <CardFooter class="d-flex align-items-center justify-content-between">
+<div
+  class={`border-2 shadow-md p-4 bg-white text-black row-span-1 col-span-2 ${className}`}
+>
+  <div>
+    <div>{cardTitle}</div>
+  </div>
+  <div class="d-flex align-items-center justify-content-between">
     <a class="small text-white stretched-link" href="charts">
       {cardFooterText}
     </a>
     <div class="small text-white">
       <i class="fas fa-angle-right" />
     </div>
-  </CardFooter>
-</Card>
+  </div>
+</div>
 

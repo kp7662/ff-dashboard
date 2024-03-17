@@ -1,4 +1,5 @@
 <script>
+  import "../app.css";
   import { Container } from "@sveltestrap/sveltestrap";
 
   import Navbar from "../lib/Navbar.svelte";

@@ -37,20 +37,19 @@
 <Breadcrumb class="mb-4">
   <BreadcrumbItem active>Dashboard</BreadcrumbItem>
 </Breadcrumb>
-<Row>
-  <div class="col-xl-3 col-md-6">
-    <DashboardCard cardTitle="Primary Card" cardColor="primary" />
-  </div>
-  <div class="col-xl-3 col-md-6">
-    <DashboardCard cardTitle="Warning Card" cardColor="warning" />
-  </div>
-  <div class="col-xl-3 col-md-6">
-    <DashboardCard cardTitle="Success Card" cardColor="success" />
-  </div>
-  <div class="col-xl-3 col-md-6">
-    <DashboardCard cardTitle="Danger Card" cardColor="danger" />
-  </div>
-</Row>
+<div
+  class="grid grid-cols-1
+  grid-rows-3 md:grid-cols-4 gap-4"
+>
+  <DashboardCard
+    class="row-span-2"
+    cardTitle="Primary Card"
+    cardColor="primary"
+  />
+  <DashboardCard cardTitle="Warning Card" cardColor="warning" />
+  <DashboardCard cardTitle="Success Card" cardColor="success" />
+  <DashboardCard cardTitle="Danger Card" cardColor="danger" />
+</div>
 
 <!-- <Navbar data={linkUtil}/> -->
 <!-- <Navbar2 {segment} {color} {title} />
