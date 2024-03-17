@@ -1,5 +1,5 @@
 # backend/app/routes.py
-from flask import Flask, jsonify, send_file
+from flask import Flask, jsonify, send_file, send_from_directory
 from app import app, db
 from sqlalchemy import text
 from .utils import *
@@ -18,6 +18,7 @@ import matplotlib
 matplotlib.use('Agg')  # Use a non-interactive backend
 import matplotlib.pyplot as plt
 
+import random
 # --------------------------------------------------------------------------------
 
 # app = Flask(__name__)
@@ -41,11 +42,15 @@ colors = ['darkred', 'blue', 'green', 'purple', 'orange',
 
 # --------------------------------------------------------------------------------
 
-# @app.route('/', methods=['GET'])
-# def index():
-#     html_code = flask.render_template('+page.svelte')
-#     response = flask.make_response(html_code)
-#     return response
+# Path for our main Svelte page
+@app.route("/")
+def base():
+    return send_from_directory('../../frontend/src', 'app.html')
+    return send_from_directory('../../frontend/src/routes', '+page.svelte')
+
+@app.route("/rand")
+def hello():
+    return str(random.randint(0, 100))
 
 # --------------------------------------------------------------------------------
 
