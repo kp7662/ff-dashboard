@@ -1,15 +1,121 @@
 # backend/app/routes.py
-from flask import Flask
+from flask import Flask, jsonify, send_file
 from app import app, db
 from sqlalchemy import text
+from .utils import *
 import folium
 import random
 import time
+import pandas as pd
+import seaborn as sns
+import flask
+
+# from flask_cors import CORS
+# from flask_sqlalchemy import SQLAlchemy
+# import os
+
+import matplotlib
+matplotlib.use('Agg')  # Use a non-interactive backend
+import matplotlib.pyplot as plt
+
+# --------------------------------------------------------------------------------
+
+# app = Flask(__name__)
+# app = flask.Flask(__name__, template_folder='../../frontend/src/routes')
+
+# Load database URI from environment variables
+# app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('SQLALCHEMY_DATABASE_URI')
+# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Configure CORS to allow requests from frontend origin
+# CORS(app)
+
+# db = SQLAlchemy(app)
+
+# --------------------------------------------------------------------------------
 
 # Define a list of colors for the routes
 colors = ['darkred', 'blue', 'green', 'purple', 'orange', 
           'darkblue', 'darkgreen', 'cadetblue', 
           'darkpurple', 'lightblue', 'lightgreen']
+
+# --------------------------------------------------------------------------------
+
+# @app.route('/', methods=['GET'])
+# def index():
+#     html_code = flask.render_template('+page.svelte')
+#     response = flask.make_response(html_code)
+#     return response
+
+# --------------------------------------------------------------------------------
+
+@app.route('/api/rideshare-data')
+def rideshare_data_route():
+    rideshare_df = get_rideshare_df()
+    # Convert DataFrame to JSON or other desired format for the response
+    rideshare_data = rideshare_df.to_dict(orient='records')
+    return jsonify({"rideshare_data": rideshare_data})
+
+# --------------------------------------------------------------------------------
+
+@app.route('/api/trips-per-driver-chart')
+def trips_per_account_chart():
+    # Fetch and preprocess the rideshare data
+    rideshare_df = get_rideshare_df()
+    
+    # Get the number of trips per account
+    trips_per_account = rideshare_df['account'].value_counts().reset_index()
+    trips_per_account.columns = ['account', 'number_of_trips']
+    
+    # Plot the number of trips per account
+    plt.figure(figsize=(12, 6))
+    ax = sns.barplot(x='account', y='number_of_trips', data=trips_per_account, color='skyblue')
+    plt.title('Number of Trips per Account', fontsize=16)
+    plt.xlabel('Account', fontsize=14)
+    plt.ylabel('Number of Trips', fontsize=14)
+    plt.xticks(rotation=45)
+    
+    # Annotate rounded count above each bar
+    for p in ax.patches:
+        ax.annotate(f'{int(p.get_height())}',
+                    (p.get_x() + p.get_width() / 2., p.get_height()),
+                    ha='center', va='center', xytext=(0, 10), textcoords='offset points',
+                    weight='bold', fontsize=12)
+    
+    # Save the plot to a file
+    chart_path = '/tmp/count_trips_per_account.svg'
+    plt.savefig(chart_path)
+    plt.close()
+    
+    # Serve the file
+    return send_file(chart_path, mimetype='image/svg+xml')
+
+# --------------------------------------------------------------------------------
+
+
+
+# --------------------------------------------------------------------------------
+
+@app.route('/api/data')
+def get_data():
+    # Get a database connection
+    conn = db.engine.connect()
+    
+    # Fetch a limited number of records from the database
+    query = """
+    SELECT *
+    FROM public.argyle_driver_activities ada
+    LIMIT 10  -- Adjust the limit later
+    """
+    result = conn.execute(query)
+    items = [dict(row) for row in result]
+
+    # Close the database connection
+    conn.close()
+
+    return jsonify({"items": items})
+
+# --------------------------------------------------------------------------------
 
 # Route to generate and display a map for a specific user's driving activities.
 # To-do: Need to modify code to access user_id through user_metadata table
@@ -117,6 +223,7 @@ def generate_map_for_user(user_id):
 
     return map_html
 
+# --------------------------------------------------------------------------------
 
 # Generate Maps (Without take rate)
 @app.route('/api/data/user/<user_id>/map/old', methods=['GET'])
