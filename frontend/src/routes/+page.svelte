@@ -15,12 +15,25 @@ import Page from "../lib/Page.svelte";
 import { Row, Breadcrumb, BreadcrumbItem } from 'sveltestrap';
 
 let title = "FF Admin Dashboard"
+
+// Testing communicating with backend
+let rand = -1;
+  function getRand() {
+    fetch("http://127.0.0.1:5000/rand")
+      .then(d => d.text())
+      .then(d => (rand = d));
+  }
 </script>
 
 <svelte:head>
   <title>{title}</title>
 </svelte:head>
 <h1 class="mt-4">Dashboard</h1>
+
+<!-- Testing communication with backend -->
+<h1>Your number is {rand}!</h1>
+<button on:click={getRand}>Get a random number</button>
+
 <Breadcrumb class="mb-4">
   <BreadcrumbItem active>Dashboard</BreadcrumbItem>
 </Breadcrumb>
