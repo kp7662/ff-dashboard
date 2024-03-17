@@ -61,6 +61,13 @@ def rideshare_data_route():
     rideshare_data = rideshare_df.to_dict(orient='records')
     return jsonify({"rideshare_data": rideshare_data})
 
+
+@app.route('/api/rideshare/average-trip-duration')
+def average_trip_duration():
+    rideshare_df = get_rideshare_df()
+    average_trip_duration = rideshare_df['duration'].mean()
+    return jsonify({"average_trip_duration": average_trip_duration})
+
 # --------------------------------------------------------------------------------
 
 @app.route('/api/trips-per-driver-chart')

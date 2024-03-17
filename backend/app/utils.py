@@ -4,8 +4,9 @@ import pandas as pd
 
 def get_rideshare_df():
     # Database query to retrieve rideshare data
+    # TODO: order this query so the result is consistent
     query = """
-    SELECT id, account, type, income_fees, income_pay, income_total
+    SELECT id, account, type, income_fees, income_pay, income_total, duration
     FROM public.argyle_driver_activities, user
     WHERE type = 'rideshare'
     LIMIT 2000;
