@@ -16,9 +16,7 @@
     <div>{cardTitle}</div>
   </div>
   <div class="d-flex align-items-center justify-content-between">
-    <a class="small text-white stretched-link" href="charts">
-      {cardFooterText}
-    </a>
+    <slot />
     <div class="small text-white">
       <i class="fas fa-angle-right" />
     </div>

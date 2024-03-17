@@ -1,0 +1,21 @@
+<script>
+  import DashboardCard from "./DashboardCard.svelte";
+
+  import { AdminDashStore } from "./stores/store";
+
+  $: console.log(
+    "[+page.svelte] avgTripDurationCard: ",
+    $AdminDashStore.averageTripDuration,
+  );
+
+  $: averageTripDuration = $AdminDashStore.averageTripDuration
+    ? $AdminDashStore.averageTripDuration
+    : "??";
+</script>
+
+<DashboardCard cardTitle="Average Duration" cardColor="primary">
+  <h1 class="text-lg font-bold">
+    {averageTripDuration} minutes
+  </h1>
+  <p class="text-xs text-gray-600">Average trip duration</p>
+</DashboardCard>

@@ -13,6 +13,42 @@
   import Page from "../lib/Page.svelte";
 
   import { Row, Breadcrumb, BreadcrumbItem } from "@sveltestrap/sveltestrap";
+  import AverageDurationCard from "../lib/AverageDurationCard.svelte";
+
+  import { AdminDashStore } from "../lib/stores/store";
+
+  export let data;
+
+  const { stats } = data;
+
+  console.log("[+page.svelte] avgTripDuration: ", stats.averageTripDuration);
+
+  AdminDashStore.set({
+    ...AdminDashStore,
+    averageTripDuration: stats.averageTripDuration,
+  });
+
+  $: console.log(
+    "[+page.svelte] AdminDashStore: ",
+    $AdminDashStore.averageTripDuration,
+  );
+
+  // this promise/fetch is now dependent on the store, and will re-fetch
+  // whenever $AdminDashStore.limit changes
+  // look (online) for something like 'svete fetch dependent on store' and I'm
+  // sure you'll find resources!
+  $: averageTripDurationPromise = fetch(
+    "http://localhost:5001/api/rideshare/average-trip-duration",
+    {
+      method: "POST",
+      body: JSON.stringify({ limit: $AdminDashStore.limit || null }),
+    },
+  ).then((r) => (r.ok ? r.json() : r.text()));
+
+  // $: averageTripDuration = $averageTripDurationPromise.then((d) => {
+  //   console.log("[+page.svelte] avgTripDuration (from store): ", d);
+  //   return d;
+  // });
 
   let title = "FF Admin Dashboard";
 
@@ -41,11 +77,7 @@
   class="grid grid-cols-1
   grid-rows-3 md:grid-cols-4 gap-4"
 >
-  <DashboardCard
-    class="row-span-2"
-    cardTitle="Primary Card"
-    cardColor="primary"
-  />
+  <AverageDurationCard class="row-span-2" cardTitle="Average Trip Duration" />
   <DashboardCard cardTitle="Warning Card" cardColor="warning" />
   <DashboardCard cardTitle="Success Card" cardColor="success" />
   <DashboardCard cardTitle="Danger Card" cardColor="danger" />
