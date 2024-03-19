@@ -8,45 +8,17 @@ import random
 import time
 import pandas as pd
 import seaborn as sns
-import flask
-
-# from flask_cors import CORS
-# from flask_sqlalchemy import SQLAlchemy
-# import os
 
 import matplotlib
 matplotlib.use('Agg')  # Use a non-interactive backend
 import matplotlib.pyplot as plt
 
 import random
-# --------------------------------------------------------------------------------
-
-# app = Flask(__name__)
-# app = flask.Flask(__name__, template_folder='../../frontend/src/routes')
-
-# Load database URI from environment variables
-# app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('SQLALCHEMY_DATABASE_URI')
-# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-# Configure CORS to allow requests from frontend origin
-# CORS(app)
-
-# db = SQLAlchemy(app)
 
 # --------------------------------------------------------------------------------
 
-# Define a list of colors for the routes
-colors = ['darkred', 'blue', 'green', 'purple', 'orange', 
-          'darkblue', 'darkgreen', 'cadetblue', 
-          'darkpurple', 'lightblue', 'lightgreen']
 
 # --------------------------------------------------------------------------------
-
-# Path for our main Svelte page
-@app.route("/")
-def base():
-    return send_from_directory('../../frontend/src', 'app.html')
-    return send_from_directory('../../frontend/src/routes', '+page.svelte')
 
 @app.route("/rand")
 def hello():
@@ -54,7 +26,7 @@ def hello():
 
 # --------------------------------------------------------------------------------
 
-@app.route('/api/rideshare-data')
+@app.route('/rideshare-data')
 def rideshare_data_route():
     rideshare_df = get_rideshare_df()
     # Convert DataFrame to JSON or other desired format for the response
@@ -62,15 +34,52 @@ def rideshare_data_route():
     return jsonify({"rideshare_data": rideshare_data})
 
 
-@app.route('/api/rideshare/average-trip-duration')
+@app.route('/rideshare/average-trip-duration')
 def average_trip_duration():
     rideshare_df = get_rideshare_df()
     average_trip_duration = rideshare_df['duration'].mean()
-    return jsonify({"average_trip_duration": average_trip_duration})
+    average_trip_duration_rounded = round(average_trip_duration, 2)
+    return jsonify({"average_trip_duration": average_trip_duration_rounded})
 
 # --------------------------------------------------------------------------------
 
-@app.route('/api/trips-per-driver-chart')
+@app.route('/pay-breakdown')
+def pay_breakdown():
+    rideshare_df = get_rideshare_pay_breakdown_df()
+    delivery_df = get_delivery_pay_breakdown_df()
+
+    # Calculate the average for each numeric column
+    rideshare_avg = rideshare_df[['income_fees', 'income_pay', 'income_tips', 'income_bonus']].mean().to_dict()
+    delivery_avg = delivery_df[['income_fees', 'income_pay', 'income_tips', 'income_bonus']].mean().to_dict()
+
+    # Prepare response data
+    data = [
+        {
+            "name": "Rideshare",
+            "pay": [
+                {"amount": rideshare_avg['income_pay'], "color": "bg-red-500"},
+                {"amount": rideshare_avg['income_tips'], "color": "bg-green-500"},
+                {"amount": rideshare_avg['income_bonus'], "color": "bg-blue-500"},
+                {"amount": rideshare_avg['income_fees'], "color": "bg-yellow-500"}
+            ]
+        },
+        {
+            "name": "Delivery",
+            "pay": [
+                {"amount": delivery_avg['income_pay'], "color": "bg-red-500"},
+                {"amount": delivery_avg['income_tips'], "color": "bg-green-500"},
+                {"amount": delivery_avg['income_bonus'], "color": "bg-blue-500"},
+                {"amount": delivery_avg['income_fees'], "color": "bg-yellow-500"}
+            ]
+        }
+    ]
+
+    # Return the data as JSON
+    return jsonify(data)
+
+# --------------------------------------------------------------------------------
+
+@app.route('/trips-per-driver-chart')
 def trips_per_account_chart():
     # Fetch and preprocess the rideshare data
     rideshare_df = get_rideshare_df()
@@ -108,7 +117,7 @@ def trips_per_account_chart():
 
 # --------------------------------------------------------------------------------
 
-@app.route('/api/data')
+@app.route('/data')
 def get_data():
     # Get a database connection
     conn = db.engine.connect()
@@ -117,6 +126,7 @@ def get_data():
     query = """
     SELECT *
     FROM public.argyle_driver_activities ada
+    ORDER BY id
     LIMIT 10  -- Adjust the limit later
     """
     result = conn.execute(query)
@@ -129,9 +139,14 @@ def get_data():
 
 # --------------------------------------------------------------------------------
 
+# Define a list of colors for the routes
+colors = ['darkred', 'blue', 'green', 'purple', 'orange', 
+          'darkblue', 'darkgreen', 'cadetblue', 
+          'darkpurple', 'lightblue', 'lightgreen']
+
 # Route to generate and display a map for a specific user's driving activities.
 # To-do: Need to modify code to access user_id through user_metadata table
-@app.route('/api/data/user/<user_id>/map', methods=['GET'])
+@app.route('/data/user/<user_id>/map', methods=['GET'])
 def generate_map_for_user(user_id):
     """
     Generates an interactive map displaying the driving activities for a specified user, identified by user_id.
@@ -238,7 +253,7 @@ def generate_map_for_user(user_id):
 # --------------------------------------------------------------------------------
 
 # Generate Maps (Without take rate)
-@app.route('/api/data/user/<user_id>/map/old', methods=['GET'])
+@app.route('/data/user/<user_id>/map/old', methods=['GET'])
 def generate_map_for_user_old(user_id):
     # Fetch and process data
     query = text("""
@@ -283,6 +298,8 @@ def generate_map_for_user_old(user_id):
     map_html = m._repr_html_()
     
     return map_html
+
+# --------------------------------------------------------------------------------
 
 if __name__ == '__main__':
     app.run(debug=True)
