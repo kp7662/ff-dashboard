@@ -11,6 +11,12 @@
   $: averageTripDuration = $AdminDashStore.averageTripDuration
     ? $AdminDashStore.averageTripDuration
     : "??";
+
+  const updateLimit = (newLimit) => {
+    AdminDashStore.update((store) => {
+      store.limit = newLimit;
+    });
+  };
 </script>
 
 <DashboardCard cardTitle="Average Duration" cardColor="primary">

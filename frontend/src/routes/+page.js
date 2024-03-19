@@ -3,9 +3,6 @@ import { AdminDashStore } from "../lib/stores/store"
 export async function load(props) {
   console.log("[+page.js] input:", props)
 
-  console.log("[+page.js] AdminDashStore:", AdminDashStore.averageTripDuration)
-
-
   // How to: change query based on URL parameters
   // i.e. you change URL to be /?numTrips=100
   const searchParams = new URLSearchParams(props.url.searchParams)
