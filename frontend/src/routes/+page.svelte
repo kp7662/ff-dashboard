@@ -4,6 +4,8 @@
   import Navbar from "$lib/Navbar.svelte";
   import Footer from "../lib/Footer2.svelte";
   import DashboardCard from "../lib/DashboardCard.svelte";
+  import Card from "../lib/Card.svelte"
+  import StackedColumnChart from "../lib/StackedColumnChart.svelte"
 
   import { linkUtil } from "../utils/linkUtil";
   import url from "../url";
@@ -38,7 +40,7 @@
   // look (online) for something like 'svete fetch dependent on store' and I'm
   // sure you'll find resources!
   $: averageTripDurationPromise = fetch(
-    "http://localhost:5001/api/rideshare/average-trip-duration",
+    "http://localhost:5000/api/rideshare/average-trip-duration",
     {
       method: "POST",
       body: JSON.stringify({ limit: $AdminDashStore.limit || null }),
@@ -75,56 +77,16 @@
 </Breadcrumb>
 <div
   class="grid grid-cols-1
-  grid-rows-3 md:grid-cols-4 gap-4"
+  grid-rows-4 md:grid-cols-4 grid-rows-1 gap-4"
 >
-  <AverageDurationCard class="row-span-2" cardTitle="Average Trip Duration" />
-  <DashboardCard cardTitle="Warning Card" cardColor="warning" />
-  <DashboardCard cardTitle="Success Card" cardColor="success" />
-  <DashboardCard cardTitle="Danger Card" cardColor="danger" />
+  <!-- <AverageDurationCard class="row-span-2" cardTitle="Average Trip Duration" /> -->
+  <Card cardTitle="Total Number of Rideshare Drivers Sign-ups" />
+  <Card cardTitle="Average Take Rate" />
+  <Card cardTitle="Average Pay per Mile" />
+  <Card cardTitle="Danger Card" />
 </div>
 
-<!-- <Navbar data={linkUtil}/> -->
-<!-- <Navbar2 {segment} {color} {title} />
-<main>
-    <h1>Hello World!</h1>
-    <br>
-    <Row>
-        <div class="col-xl-3 col-md-6">
-          <DashboardCard cardTitle="Primary Card" cardColor="primary" />
-        </div>
-        <div class="col-xl-3 col-md-6">
-          <DashboardCard cardTitle="Warning Card" cardColor="warning" />
-        </div>
-        <div class="col-xl-3 col-md-6">
-          <DashboardCard cardTitle="Success Card" cardColor="success" />
-        </div>
-        <div class="col-xl-3 col-md-6">
-          <DashboardCard cardTitle="Danger Card" cardColor="danger" />
-        </div>
-      </Row>
-    {#each pageUtil as page}
-    {#if $url.hash === page.url || ($url.hash === '' && page.url === '#/')}
-      <Page page={page} />
-    {/if}
-    {/each} -->
-<!-- </main>
-<Footer2 />
-
-
-<style>
-    main {
-        min-height: calc(100vh - 4rem); /* Adjust 4rem based on navbar height */
-        padding-bottom: 4rem; /* Adjust based on footer height */
-        display: flex;
-        justify-content: center;
-        align-items: left;
-        flex-direction: column;
-    }
-
-    h1 {
-        margin: 0;
-        font-size: 2rem; /* Adjust as needed */
-    }
-
-</style> -->
-
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+  <StackedColumnChart />
+  <StackedColumnChart />
+</div>
