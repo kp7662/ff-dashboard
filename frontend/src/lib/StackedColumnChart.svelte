@@ -59,9 +59,9 @@ onMount(async () => {
 
 <div class="w-full">
 <div class="flex flex-col items-center w-full bg-white rounded-lg shadow-xl p-4">
-    <h2 class="text-xl font-bold">Income Breakdown by Category (Percentages)</h2>
+    <h2 class="text-xl font-bold">Avg. Income Breakdown by Category (Percentages)</h2>
     <!-- Can add any subtitle here -->
-    <span class="text-sm font-semibold text-gray-500"></span> 
+    <span class="text-sm font-semibold text-gray-500">Live data from the database</span> 
     <div class="flex items-end flex-grow w-full mt-2 space-x-2 sm:space-x-3">
         {#each categories as { name, pay }}
             <div class="flex flex-col items-center w-full">

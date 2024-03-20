@@ -7,13 +7,6 @@
   import StableStatsCard from "../lib/StableStatsCard.svelte"
   import StackedColumnChart from "../lib/StackedColumnChart.svelte"
 
-  import { linkUtil } from "../utils/linkUtil";
-  import url from "../url";
-  // $: console.log($url);
-  // console.log(url); // Should log the store, not `undefined`
-  import { pageUtil } from "../utils/pageUtil";
-  import Page from "../lib/Page.svelte";
-
   import { Row, Breadcrumb, BreadcrumbItem } from "@sveltestrap/sveltestrap";
   import AverageDurationCard from "../lib/AverageDurationCard.svelte";
 
@@ -77,13 +70,17 @@
 </Breadcrumb>
 <div
   class="grid grid-cols-1
-  grid-rows-1 md:grid-cols-4 grid-rows-1 gap-4"
+  grid-rows-2 md:grid-cols-4 grid-rows-2 gap-4"
 >
   <!-- <AverageDurationCard class="row-span-2" cardTitle="Average Trip Duration" /> -->
   <StableStatsCard cardTitle="Total Number of Rideshare Drivers Sign-ups" />
+  <StableStatsCard cardTitle="Total Number of Delivery Drivers Sign-ups" />
   <StableStatsCard cardTitle="Average Take Rate" />
+  <StableStatsCard cardTitle="Survey Results on “fair” take vs real" />
   <StableStatsCard cardTitle="Average Pay per Mile" />
-  <StableStatsCard cardTitle="Danger Card" />
+  <StableStatsCard cardTitle="Average Pay per Minute/Hour" />
+  <StableStatsCard cardTitle="Customer Rate per Mile/Minute" />
+  <StableStatsCard cardTitle="XXX" />
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
