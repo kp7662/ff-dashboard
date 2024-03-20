@@ -4,7 +4,7 @@
   import Navbar from "$lib/Navbar.svelte";
   import Footer from "../lib/Footer2.svelte";
   import DashboardCard from "../lib/DashboardCard.svelte";
-  import Card from "../lib/Card.svelte"
+  import StableStatsCard from "../lib/StableStatsCard.svelte"
   import StackedColumnChart from "../lib/StackedColumnChart.svelte"
 
   import { linkUtil } from "../utils/linkUtil";
@@ -77,16 +77,15 @@
 </Breadcrumb>
 <div
   class="grid grid-cols-1
-  grid-rows-4 md:grid-cols-4 grid-rows-1 gap-4"
+  grid-rows-1 md:grid-cols-4 grid-rows-1 gap-4"
 >
   <!-- <AverageDurationCard class="row-span-2" cardTitle="Average Trip Duration" /> -->
-  <Card cardTitle="Total Number of Rideshare Drivers Sign-ups" />
-  <Card cardTitle="Average Take Rate" />
-  <Card cardTitle="Average Pay per Mile" />
-  <Card cardTitle="Danger Card" />
+  <StableStatsCard cardTitle="Total Number of Rideshare Drivers Sign-ups" />
+  <StableStatsCard cardTitle="Average Take Rate" />
+  <StableStatsCard cardTitle="Average Pay per Mile" />
+  <StableStatsCard cardTitle="Danger Card" />
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-  <StackedColumnChart />
   <StackedColumnChart />
 </div>
