@@ -41,6 +41,13 @@ def average_trip_duration():
     average_trip_duration_rounded = round(average_trip_duration, 2)
     return jsonify({"average_trip_duration": average_trip_duration_rounded})
 
+@app.route('/monthly-pay')
+def rideshare_monthly_pay():
+    rideshare_df = get_rideshare_df()
+    # Convert DataFrame to JSON or other desired format for the response
+    rideshare_data = rideshare_df[["start_datetime", "current_pay"]].to_dict(orient='records')
+    return jsonify({"rideshare_data": rideshare_data})
+
 # --------------------------------------------------------------------------------
 
 @app.route('/pay-breakdown')
@@ -57,19 +64,19 @@ def pay_breakdown():
         {
             "name": "Rideshare",
             "pay": [
-                {"amount": rideshare_avg['income_pay'], "color": "bg-red-500"},
-                {"amount": rideshare_avg['income_tips'], "color": "bg-green-500"},
-                {"amount": rideshare_avg['income_bonus'], "color": "bg-blue-500"},
-                {"amount": rideshare_avg['income_fees'], "color": "bg-yellow-500"}
+                {"type": "income_pay","amount": rideshare_avg['income_pay']},
+                {"type": "income_tips", "amount": rideshare_avg['income_tips']},
+                {"type": "income_bonus", "amount": rideshare_avg['income_bonus']},
+                {"type": "income_fees", "amount": rideshare_avg['income_fees']}
             ]
         },
         {
             "name": "Delivery",
             "pay": [
-                {"amount": delivery_avg['income_pay'], "color": "bg-red-500"},
-                {"amount": delivery_avg['income_tips'], "color": "bg-green-500"},
-                {"amount": delivery_avg['income_bonus'], "color": "bg-blue-500"},
-                {"amount": delivery_avg['income_fees'], "color": "bg-yellow-500"}
+                {"type": "income_pay", "amount": delivery_avg['income_pay']},
+                {"type": "income_tips", "amount": delivery_avg['income_tips']},
+                {"type": "income_bonus", "amount": delivery_avg['income_bonus']},
+                {"type": "income_fees", "amount": delivery_avg['income_fees']}
             ]
         }
     ]

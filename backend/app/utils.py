@@ -16,6 +16,8 @@ def get_rideshare_df():
     
     # Preprocess the data
     df['income_total_charge'] = df['income_fees'] + df['income_total']
+    df['current_pay'] = df['income_pay'] + df['income_bonus'] # exclude tips from current pay
+    df['pay_per_mile'] = df['current_pay'] / df['distance']
     
     return df
 
@@ -26,7 +28,7 @@ def get_rideshare_pay_breakdown_df():
     FROM public.argyle_driver_activities
     WHERE type = 'rideshare'
     ORDER BY id
-    LIMIT 2000;
+    LIMIT 10000;
     """
     with db.engine.connect() as conn:
         result = conn.execute(text(query))
@@ -45,7 +47,7 @@ def get_delivery_pay_breakdown_df():
     FROM public.argyle_driver_activities
     WHERE type = 'delivery'
     ORDER BY id
-    LIMIT 2000;
+    LIMIT 10000;
     """
     with db.engine.connect() as conn:
         result = conn.execute(text(query))
