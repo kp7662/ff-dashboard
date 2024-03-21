@@ -6,6 +6,7 @@
   import DashboardCard from "../lib/DashboardCard.svelte";
   import StableStatsCard from "../lib/StableStatsCard.svelte"
   import StackedColumnChart from "../lib/StackedColumnChart.svelte"
+  import MonthlyPayChart from "../lib/MonthlyPayChart.svelte"
 
   import { Row, Breadcrumb, BreadcrumbItem } from "@sveltestrap/sveltestrap";
   import AverageDurationCard from "../lib/AverageDurationCard.svelte";
@@ -16,17 +17,18 @@
 
   const { stats } = data;
 
-  console.log("[+page.svelte] avgTripDuration: ", stats.averageTripDuration);
+  // console.log("[+page.svelte] avgTripDuration: ", stats.averageTripDuration);
+  // console.log('[+page.svelte] Loaded: Time Page');
 
   AdminDashStore.set({
     ...AdminDashStore,
     averageTripDuration: stats.averageTripDuration,
   });
 
-  $: console.log(
-    "[+page.svelte] AdminDashStore: ",
-    $AdminDashStore.averageTripDuration,
-  );
+  // $: console.log(
+  //   "[+page.svelte] AdminDashStore: ",
+  //   $AdminDashStore.averageTripDuration,
+  // );
 
   // this promise/fetch is now dependent on the store, and will re-fetch
   // whenever $AdminDashStore.limit changes
@@ -85,4 +87,8 @@
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
   <StackedColumnChart />
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+  <MonthlyPayChart />
 </div>

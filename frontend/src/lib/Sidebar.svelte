@@ -1,5 +1,7 @@
+<!-- frontend/src/lib/Sidebar.svelte -->
 <script>
   import { Nav, Collapse } from "@sveltestrap/sveltestrap";
+  import { goto } from '$app/navigation';
 
   import SidebarItem from "./SidebarItem.svelte";
 
@@ -8,7 +10,7 @@
 
   $: sidenav_theme = `sb-sidenav-${theme}`;
 
-  let isLayoutOpen = false;
+  let isAnalysisOpen = false;
   let isPageOpen = false;
   let isAuthenticationOpen = false;
   let isErrorOpen = false;
@@ -16,16 +18,21 @@
   let footerName = "FF Admin";
   let footerText = "Logged in as:";
 
+  $: console.log('Sidebar states:', {isAnalysisOpen, isPageOpen, isAuthenticationOpen, isErrorOpen});
+  $: console.log('Current Theme:', theme);
+
   const updateActiveLink = (linkName) => (activeLink = linkName);
 
-  const toggleLayout = () => {
-    isLayoutOpen = !isLayoutOpen;
+  const toggleAnalysis = () => {
+    isAnalysisOpen = !isAnalysisOpen;
+    console.log('Toggle Analysis: isAnalysisOpen =', isAnalysisOpen);
     if (isPageOpen === true) isPageOpen = false;
   };
 
   const togglePages = () => {
     isPageOpen = !isPageOpen;
-    if (isLayoutOpen === true) isLayoutOpen = false;
+    console.log('Toggle Pages: isPageOpen =', isPageOpen);
+    if (isAnalysisOpen === true) isAnalysisOpen = false;
     if (isPageOpen === false) {
       isAuthenticationOpen = false;
       isErrorOpen = false;
@@ -41,6 +48,15 @@
     isErrorOpen = !isErrorOpen;
     if (isAuthenticationOpen === true) isAuthenticationOpen = false;
   };
+
+  // Function to navigate and perform other actions
+  function navigateToTimeAnalysis() {
+    theme = "dark"; // Setting theme
+    updateActiveLink("Time"); // Updating the active link
+    console.log('Active Link Updated:', activeLink);
+    goto('/analysis/time'); // Navigating to the Time Analysis page
+  }
+
 </script>
 
 <div id="layoutSidenav_nav" class="sb-nav-fixed">
@@ -64,8 +80,8 @@
         </SidebarItem>
         <div class="sb-sidenav-menu-heading">Interface</div>
         <SidebarItem
-          on:press={toggleLayout}
-          class={!isLayoutOpen ? "collapsed" : ""}
+          on:press={toggleAnalysis}
+          class={!isAnalysisOpen ? "collapsed" : ""}
           text="Analysis"
           leftIcon
           rightIcon
@@ -73,29 +89,38 @@
           <i class="fas fa-columns" slot="leftIcon" />
           <i class="fas fa-angle-down" slot="rightIcon" />
         </SidebarItem>
-        <Collapse isOpen={isLayoutOpen}>
+        <Collapse isOpen={isAnalysisOpen}>
           <Nav class="sb-sidenav-menu-nested">
             <SidebarItem
+              on:press={navigateToTimeAnalysis}
+              class={segment === "analysis" && activeLink === "Time" ? "active" : ""}
+              text="Time Analysis"
+              leftIcon
+              rightIcon
+            />
+            <!-- <SidebarItem
               on:press={() => {
                 theme = "dark";
-                updateActiveLink("Static Navigation");
+                updateActiveLink("Time");
+                console.log('Active Link Updated:', activeLink);
               }}
-              class={segment === "layouts" && activeLink === "Static Navigation"
+              class={segment === "analysis" && activeLink === "Time"
                 ? "active"
                 : ""}
-              href="layouts/static_navigation"
-              text="Static Navigation"
-            />
+              href="/analysis/time"
+              text="Time Analysis"
+            /> -->
             <SidebarItem
               on:press={() => {
                 theme = "light";
-                updateActiveLink("Light Sidenav");
+                updateActiveLink("Deep Dive");
+                console.log('Active Link Updated:', activeLink);
               }}
-              class={segment === "layouts" && activeLink === "Light Sidenav"
+              class={segment === "analysis" && activeLink === "Deep Dive"
                 ? "active"
                 : ""}
-              href="layouts/light_sidenav"
-              text="Light Sidenav"
+              href="analysis/deep-dive"
+              text="Deep Dive Analysis"
             />
           </Nav>
         </Collapse>

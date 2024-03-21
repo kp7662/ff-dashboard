@@ -12,7 +12,8 @@
   let color = "dark";
   let title = "FF Admin";
 
-  console.log("[layout.svelte] : layout.svelte called");
+  console.log('[+layout.svelte] Loaded');
+  console.log('Segment: ', segment);
 </script>
 
 <svelte:head>
