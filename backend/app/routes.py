@@ -43,10 +43,25 @@ def average_trip_duration():
 
 @app.route('/monthly-pay')
 def rideshare_monthly_pay():
-    rideshare_df = get_rideshare_df()
-    # Convert DataFrame to JSON or other desired format for the response
-    rideshare_data = rideshare_df[["start_datetime", "current_pay"]].to_dict(orient='records')
-    return jsonify({"rideshare_data": rideshare_data})
+    rideshare_df = get_rideshare_df()  # Assuming this function retrieves your DataFrame
+
+    # Formula to calculate monthly average pay:
+    rideshare_df['datetime'] = pd.to_datetime(rideshare_df['start_datetime'])
+    rideshare_df['current_pay'] = pd.to_numeric(rideshare_df['current_pay'], errors='coerce')
+
+    # Create a new column 'year_month' to store the year and month of each ride
+    rideshare_df['year_month'] = rideshare_df['datetime'].dt.to_period('M')
+
+    # Calculate monthly average pay
+    monthly_average_pay = rideshare_df.groupby('year_month')['current_pay'].mean().reset_index()
+
+    # Convert year_month to string for better readability in the JSON response
+    monthly_average_pay['year_month'] = monthly_average_pay['year_month'].astype(str)
+
+    # Convert DataFrame to dictionary for JSON response
+    result = monthly_average_pay.to_dict(orient='records')
+
+    return jsonify({"monthly_average_pay": result})
 
 # --------------------------------------------------------------------------------
 
