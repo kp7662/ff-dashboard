@@ -18,8 +18,8 @@
   let footerName = "FF Admin";
   let footerText = "Logged in as:";
 
-  $: console.log('Sidebar states:', {isAnalysisOpen, isPageOpen, isAuthenticationOpen, isErrorOpen});
-  $: console.log('Current Theme:', theme);
+  // $: console.log('Sidebar states:', {isAnalysisOpen, isPageOpen, isAuthenticationOpen, isErrorOpen});
+  // $: console.log('Current Theme:', theme);
 
   const updateActiveLink = (linkName) => (activeLink = linkName);
 
@@ -49,12 +49,20 @@
     if (isAuthenticationOpen === true) isAuthenticationOpen = false;
   };
 
-  // Function to navigate and perform other actions
+  // Function to navigate to Time Analysis Page
   function navigateToTimeAnalysis() {
-    theme = "dark"; // Setting theme
-    updateActiveLink("Time"); // Updating the active link
-    console.log('Active Link Updated:', activeLink);
-    goto('/analysis/time'); // Navigating to the Time Analysis page
+    theme = "dark";
+    updateActiveLink("Time"); 
+    // console.log('Active Link Updated:', activeLink);
+    goto('/time'); 
+  }
+
+  // Function to navigate to Deep Dive Analysis Page
+  function navigateToDeepDiveAnalysis() {
+    theme = "dark"; 
+    updateActiveLink("Deep Dive"); 
+    // console.log('Active Link Updated:', activeLink);
+    goto('/deep_dive');
   }
 
 </script>
@@ -93,34 +101,17 @@
           <Nav class="sb-sidenav-menu-nested">
             <SidebarItem
               on:press={navigateToTimeAnalysis}
-              class={segment === "analysis" && activeLink === "Time" ? "active" : ""}
+              class={segment === "time" && activeLink === "Time" ? "active" : ""}
               text="Time Analysis"
               leftIcon
               rightIcon
             />
-            <!-- <SidebarItem
-              on:press={() => {
-                theme = "dark";
-                updateActiveLink("Time");
-                console.log('Active Link Updated:', activeLink);
-              }}
-              class={segment === "analysis" && activeLink === "Time"
-                ? "active"
-                : ""}
-              href="/analysis/time"
-              text="Time Analysis"
-            /> -->
             <SidebarItem
-              on:press={() => {
-                theme = "light";
-                updateActiveLink("Deep Dive");
-                console.log('Active Link Updated:', activeLink);
-              }}
-              class={segment === "analysis" && activeLink === "Deep Dive"
-                ? "active"
-                : ""}
-              href="analysis/deep-dive"
+              on:press={navigateToDeepDiveAnalysis}
+              class={segment === "deep_dive" && activeLink === "Deep Dive" ? "active" : ""}
               text="Deep Dive Analysis"
+              leftIcon
+              rightIcon
             />
           </Nav>
         </Collapse>

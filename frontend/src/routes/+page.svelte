@@ -1,3 +1,4 @@
+<!-- frontend/src/routes/+page.svelte -->
 <!-- https://github.com/consultingninja/svelteTemplateProject/blob/main/src/App.svelte -->
 
 <script>
@@ -87,8 +88,9 @@
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
   <StackedColumnChart />
+  <MonthlyPayChart />
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-  <MonthlyPayChart />
+  <!-- <MonthlyPayChart /> -->
 </div>
