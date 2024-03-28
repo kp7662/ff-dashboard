@@ -51,22 +51,22 @@
   let title = "FF Admin Dashboard";
 
   // Testing communicating with backend
-  let rand = -1;
-  function getRand() {
-    fetch("http://127.0.0.1:5000/rand")
-      .then((d) => d.text())
-      .then((d) => (rand = d));
-  }
+  // let rand = -1;
+  // function getRand() {
+  //   fetch("http://127.0.0.1:5000/rand")
+  //     .then((d) => d.text())
+  //     .then((d) => (rand = d));
+  // }
 </script>
 
 <svelte:head>
   <title>{title}</title>
 </svelte:head>
-<h1 class="mt-4">Dashboard</h1>
+<h1 class="mt-4">Overview</h1>
 
 <!-- Testing communication with backend -->
-<h6>Your number is {rand}!</h6>
-<button on:click={getRand}>Get a random number</button>
+<!-- <h6>Your number is {rand}!</h6>
+<button on:click={getRand}>Get a random number</button> -->
 
 <Breadcrumb class="mb-4">
   <BreadcrumbItem active>Dashboard</BreadcrumbItem>
