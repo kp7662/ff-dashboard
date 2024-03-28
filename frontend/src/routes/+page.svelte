@@ -12,19 +12,19 @@
   import { Row, Breadcrumb, BreadcrumbItem } from "@sveltestrap/sveltestrap";
   import AverageDurationCard from "../lib/AverageDurationCard.svelte";
 
-  import { AdminDashStore } from "../lib/stores/store";
+  // import { AdminDashStore } from "../lib/stores/store";
 
-  export let data;
+  // export let data;
 
-  const { stats } = data;
+  // const { stats } = data;
 
   // console.log("[+page.svelte] avgTripDuration: ", stats.averageTripDuration);
   // console.log('[+page.svelte] Loaded: Time Page');
 
-  AdminDashStore.set({
-    ...AdminDashStore,
-    averageTripDuration: stats.averageTripDuration,
-  });
+  // AdminDashStore.set({
+  //   ...AdminDashStore,
+  //   averageTripDuration: stats.averageTripDuration,
+  // });
 
   // $: console.log(
   //   "[+page.svelte] AdminDashStore: ",
@@ -35,13 +35,13 @@
   // whenever $AdminDashStore.limit changes
   // look (online) for something like 'svete fetch dependent on store' and I'm
   // sure you'll find resources!
-  $: averageTripDurationPromise = fetch(
-    "http://localhost:5000/api/rideshare/average-trip-duration",
-    {
-      method: "POST",
-      body: JSON.stringify({ limit: $AdminDashStore.limit || null }),
-    },
-  ).then((r) => (r.ok ? r.json() : r.text()));
+  // $: averageTripDurationPromise = fetch(
+  //   "http://localhost:5000/rideshare/average-trip-duration",
+  //   {
+  //     method: "POST",
+  //     body: JSON.stringify({ limit: $AdminDashStore.limit || null }),
+  //   },
+  // ).then((r) => (r.ok ? r.json() : r.text()));
 
   // $: averageTripDuration = $averageTripDurationPromise.then((d) => {
   //   console.log("[+page.svelte] avgTripDuration (from store): ", d);
@@ -65,7 +65,7 @@
 <h1 class="mt-4">Dashboard</h1>
 
 <!-- Testing communication with backend -->
-<h1>Your number is {rand}!</h1>
+<h6>Your number is {rand}!</h6>
 <button on:click={getRand}>Get a random number</button>
 
 <Breadcrumb class="mb-4">
