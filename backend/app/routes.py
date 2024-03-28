@@ -67,8 +67,10 @@ def rideshare_monthly_pay():
 
 @app.route('/pay-breakdown')
 def pay_breakdown():
-    rideshare_df = get_rideshare_pay_breakdown_df()
-    delivery_df = get_delivery_pay_breakdown_df()
+    # rideshare_df = get_rideshare_pay_breakdown_df(date_filter='7d', start_date=None, end_date=None)
+    # delivery_df = get_delivery_pay_breakdown_df(date_filter='7d', start_date=None, end_date=None)
+    rideshare_df = get_rideshare_pay_breakdown_df(date_filter=None, start_date='2023-12-01', end_date='2024-03-01')
+    delivery_df = get_delivery_pay_breakdown_df(date_filter=None, start_date='2023-12-01', end_date='2024-03-01')
 
     # Calculate the average for each numeric column
     rideshare_avg = rideshare_df[['income_fees', 'income_pay', 'income_tips', 'income_bonus']].mean().to_dict()
@@ -104,7 +106,7 @@ def pay_breakdown():
 @app.route('/trips-per-driver-chart')
 def trips_per_account_chart():
     # Fetch and preprocess the rideshare data
-    rideshare_df = get_rideshare_df()
+    rideshare_df = get_rideshare_data(date_filter='7d')
     
     # Get the number of trips per account
     trips_per_account = rideshare_df['account'].value_counts().reset_index()

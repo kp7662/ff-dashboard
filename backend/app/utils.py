@@ -116,6 +116,103 @@ def get_rideshare_data(date_filter='7d', start_date=None, end_date=None):
 
 # --------------------------------------------------------------------------------
 
+def get_delivery_data(date_filter='7d', start_date=None, end_date=None):
+    """
+    Fetches and returns delivery data as a DataFrame, based on either a predefined period
+    or specific start and end dates provided by the user.
+
+    Parameters:
+    - date_filter (str): A predefined period for data retrieval ('7d', '1m', '3m', '6m', '1y').
+                         Used only if start_date and end_date are not provided.
+    - start_date (str or None): The start date for data filtering in 'YYYY-MM-DD' format.
+    - end_date (str or None): The end date for data filtering in 'YYYY-MM-DD' format.
+
+    Returns:
+    - DataFrame: Processed delivery data for the requested period or date range.
+    """
+
+    # Determine cache key based on input parameters
+    if start_date and end_date:
+        cache_key = f'delivery_data_custom_{start_date}_{end_date}'
+    else:
+        cache_key = f'delivery_data_{date_filter}'
+
+    # Start measuring time
+    start_time = time.time()
+    
+    # Try to fetch from cache first
+    cached_data = cache.get(cache_key)
+    if cached_data is not None:
+        cache_duration = time.time() - start_time
+        logger.info(f"Cache hit for {cache_key}. Loaded data from cache in {cache_duration:.2f} seconds.")
+        return pd.read_json(StringIO(cached_data), orient='split')
+
+    # If cache miss, query the database based on the provided dates or period    
+    if start_date and end_date:
+        # Convert string dates to datetime objects
+        start_date = pd.to_datetime(start_date)
+        end_date = pd.to_datetime(end_date)
+    else:
+        # Calculate start_date and end_date based on the period
+        end_date = datetime.now()
+        if date_filter == '7d':
+            start_date = end_date - timedelta(days=7)
+        elif date_filter == '1m':
+            start_date = end_date - timedelta(days=30)
+        elif date_filter == '3m':
+            start_date = end_date - timedelta(days=91)
+        elif date_filter == '6m':
+            start_date = end_date - timedelta(days=182)
+        elif date_filter == '1y':
+            start_date = end_date - timedelta(days=365)
+        else:
+            start_date = end_date - timedelta(days=7)  # Default case
+
+    logger.info(f"Cache miss for {cache_key}. Querying database...")
+    
+    # Reset start time for measuring database query duration
+    db_start_time = time.time()
+    
+    query = """
+    SELECT id, account, employer, created_at, updated_at, status, type,
+    all_datetimes_request_at, duration, timezone, earning_type, 
+    start_location_lat, start_location_lng, start_location_formatted_address, 
+    end_location_lat, end_location_lng, end_location_formatted_address, distance, 
+    distance_unit, metadata, circumstances_is_pool, circumstances_is_surge, 
+    circumstances_service_type, circumstances_position, income_currency, 
+    income_total_charge, income_fees, income_total, income_pay, income_tips,
+    income_bonus, metadata_origin_id, end_datetime, start_datetime, task_count, 
+    income_other, user 
+    FROM public.argyle_driver_activities
+    WHERE type = 'delivery' AND
+    start_datetime::timestamp >= :start_date AND
+    start_datetime::timestamp <= :end_date
+    ORDER BY id;
+    """
+    with db.engine.connect() as conn:
+        result = conn.execute(text(query), {'start_date': start_date, 'end_date': end_date})
+        df = pd.DataFrame(result.fetchall(), columns=result.keys())
+
+    # Calculate and log time taken for database operations
+    db_duration = time.time() - db_start_time
+    logger.info(f"Loaded data from database in {db_duration:.2f} seconds.")
+
+    # Preprocess the data
+
+    # Replace 0 or None in 'distance' with NaN (if needed)
+    df['distance'] = df['distance'].replace(0, np.nan).fillna(np.nan)
+
+    df['income_total_charge'] = df['income_fees'] + df['income_total']
+    df['current_pay'] = df['income_pay'] + df['income_bonus']  # Exclude tips from current pay
+    df['pay_per_mile'] = np.where(df['distance'] != 0, df['current_pay'] / df['distance'], np.nan)
+
+    # Cache the processed DataFrame
+    cache.set(cache_key, df.to_json(orient='split'), timeout=3600) # Can adjust TTL later
+
+    return df
+
+# --------------------------------------------------------------------------------
+
 def get_rideshare_avg_trip_duration():
     """
     Retrieves the average trip duration of rideshare activities from cache or, if not available, computes it from
@@ -225,28 +322,63 @@ def get_rideshare_monthly_pay():
 
 # --------------------------------------------------------------------------------
 
-def get_rideshare_pay_breakdown_df():
-    # Database query to retrieve rideshare data
-    query = """
-    SELECT id, income_fees, income_pay, income_tips, income_bonus
-    FROM public.argyle_driver_activities
-    WHERE type = 'rideshare'
-    ORDER BY id
-    LIMIT 10000;
+def get_rideshare_pay_breakdown_df(date_filter='7d', start_date=None, end_date=None):
     """
-    with db.engine.connect() as conn:
-        result = conn.execute(text(query))
-        df = pd.DataFrame(result.fetchall(), columns=result.keys())
-    
-        # Convert columns to float
+    Fetches and returns a DataFrame containing a breakdown of rideshare payments,
+    optionally filtered by a predefined period or specific start and end dates.
+
+    Parameters:
+    - date_filter (str): A predefined period for data retrieval ('7d', '1m', '3m', '6m', '1y').
+                         Used only if start_date and end_date are not provided.
+    - start_date (str or None): The start date for data filtering in 'YYYY-MM-DD' format.
+    - end_date (str or None): The end date for data filtering in 'YYYY-MM-DD' format.
+
+    Returns:
+    - DataFrame: A pandas DataFrame containing the rideshare payment breakdown.
+    """
+    # Use the previously defined function to fetch rideshare data with caching
+    df = get_rideshare_data(date_filter, start_date, end_date)
+
+    # Filter the DataFrame to include only the relevant columns for payment breakdown
+    df = df[['id', 'income_fees', 'income_pay', 'income_tips', 'income_bonus']]
+
+    # Convert columns to float, ensuring any non-numeric entries are handled gracefully
     for column in ['income_fees', 'income_pay', 'income_tips', 'income_bonus']:
-        df[column] = pd.to_numeric(df[column], errors='coerce').astype(float)
+        df[column] = pd.to_numeric(df[column], errors='coerce').fillna(0.0).astype(float)
 
     return df
 
 # --------------------------------------------------------------------------------
 
-def get_delivery_pay_breakdown_df():
+def get_delivery_pay_breakdown_df(date_filter='7d', start_date=None, end_date=None):
+    """
+    Fetches and returns a DataFrame containing a breakdown of delivery payments,
+    optionally filtered by a predefined period or specific start and end dates.
+
+    Parameters:
+    - date_filter (str): A predefined period for data retrieval ('7d', '1m', '3m', '6m', '1y').
+                         Used only if start_date and end_date are not provided.
+    - start_date (str or None): The start date for data filtering in 'YYYY-MM-DD' format.
+    - end_date (str or None): The end date for data filtering in 'YYYY-MM-DD' format.
+
+    Returns:
+    - DataFrame: A pandas DataFrame containing the rideshare payment breakdown.
+    """
+    # Use the previously defined function to fetch rideshare data with caching
+    df = get_delivery_data(date_filter, start_date, end_date)
+
+    # Filter the DataFrame to include only the relevant columns for payment breakdown
+    df = df[['id', 'income_fees', 'income_pay', 'income_tips', 'income_bonus']]
+
+    # Convert columns to float, ensuring any non-numeric entries are handled gracefully
+    for column in ['income_fees', 'income_pay', 'income_tips', 'income_bonus']:
+        df[column] = pd.to_numeric(df[column], errors='coerce').fillna(0.0).astype(float)
+
+    return df
+
+
+
+def get_delivery_pay_breakdown_df_old():
     # Database query to retrieve delivery data
     query = """
     SELECT id, income_fees, income_pay, income_tips, income_bonus
