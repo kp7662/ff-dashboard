@@ -19,59 +19,62 @@ logger = logging.getLogger(__name__)
 
 # --------------------------------------------------------------------------------
 
-def get_rideshare_data_by_period(period='7d'):
+def get_rideshare_data(date_filter='7d', start_date=None, end_date=None):
     """
-    Fetches rideshare data for a specified period from cache or database, preprocesses, and returns it as a DataFrame.
-
-    If the data is found in cache, it is loaded and deserialized. If not found, the data is queried from the database
-    based on the given period ('7d', '1m', '3m', '6m', '1y'), where 'd' stands for days and 'm' for months. The query
-    retrieves various details related to rideshare activities within the specified period. Before returning, this
-    function preprocesses the data by replacing zeros or Nones in 'distance' with NaN, calculating the total charge,
-    adjusting the current pay by excluding tips, and computing pay per mile. The preprocessed data is then cached for
-    future requests.
+    Fetches and returns rideshare data as a DataFrame, based on either a predefined period
+    or specific start and end dates provided by the user.
 
     Parameters:
-    - period (str): The period for which to retrieve rideshare data. Default is '7d'. Accepted values are '7d', '1m',
-    '3m', '6m', '1y'.
+    - date_filter (str): A predefined period for data retrieval ('7d', '1m', '3m', '6m', '1y').
+                         Used only if start_date and end_date are not provided.
+    - start_date (str or None): The start date for data filtering in 'YYYY-MM-DD' format.
+    - end_date (str or None): The end date for data filtering in 'YYYY-MM-DD' format.
 
     Returns:
-    - DataFrame: A pandas DataFrame containing the processed rideshare data for the requested period.
+    - DataFrame: Processed rideshare data for the requested period or date range.
     """
-    cache_key = f'rideshare_data_{period}'
-    
+
+    # Determine cache key based on input parameters
+    if start_date and end_date:
+        cache_key = f'rideshare_data_custom_{start_date}_{end_date}'
+    else:
+        cache_key = f'rideshare_data_{date_filter}'
+
     # Start measuring time
     start_time = time.time()
-
-    cached_data = cache.get(cache_key)
     
+    # Try to fetch from cache first
+    cached_data = cache.get(cache_key)
     if cached_data is not None:
-        # Cache hit, calculate time taken to retrieve from cache
         cache_duration = time.time() - start_time
         logger.info(f"Cache hit for {cache_key}. Loaded data from cache in {cache_duration:.2f} seconds.")
-        
-        # Deserialize and return the DataFrame
         return pd.read_json(StringIO(cached_data), orient='split')
-    
-    # If cache miss, log it and proceed to query the database
+
+    # If cache miss, query the database based on the provided dates or period    
+    if start_date and end_date:
+        # Convert string dates to datetime objects
+        start_date = pd.to_datetime(start_date)
+        end_date = pd.to_datetime(end_date)
+    else:
+        # Calculate start_date and end_date based on the period
+        end_date = datetime.now()
+        if date_filter == '7d':
+            start_date = end_date - timedelta(days=7)
+        elif date_filter == '1m':
+            start_date = end_date - timedelta(days=30)
+        elif date_filter == '3m':
+            start_date = end_date - timedelta(days=91)
+        elif date_filter == '6m':
+            start_date = end_date - timedelta(days=182)
+        elif date_filter == '1y':
+            start_date = end_date - timedelta(days=365)
+        else:
+            start_date = end_date - timedelta(days=7)  # Default case
+
     logger.info(f"Cache miss for {cache_key}. Querying database...")
+    
     # Reset start time for measuring database query duration
     db_start_time = time.time()
-
-    # Calculate the start date based on the period
-    end_date = datetime.now()
-    if period == '7d':
-        start_date = end_date - timedelta(days=7)
-    elif period == '1m':
-        start_date = end_date - timedelta(days=30)
-    elif period == '3m':
-        start_date = end_date - timedelta(days=91)
-    elif period == '6m':
-        start_date = end_date - timedelta(days=182)
-    elif period == '1y':
-        start_date = end_date - timedelta(days=365)
-    else:
-        # Default to 7 days if period is not recognized
-        start_date = end_date - timedelta(days=7)
     
     query = """
     SELECT id, account, employer, created_at, updated_at, status, type,
@@ -82,7 +85,7 @@ def get_rideshare_data_by_period(period='7d'):
     circumstances_service_type, circumstances_position, income_currency, 
     income_total_charge, income_fees, income_total, income_pay, income_tips,
     income_bonus, metadata_origin_id, end_datetime, start_datetime, task_count, 
-    income_other, user
+    income_other, user 
     FROM public.argyle_driver_activities
     WHERE type = 'rideshare' AND
     start_datetime::timestamp >= :start_date AND
@@ -201,8 +204,7 @@ def get_rideshare_monthly_pay():
         SELECT id, start_datetime, income_fees, income_total, income_pay, income_bonus
         FROM public.argyle_driver_activities
         WHERE type = 'rideshare'
-        ORDER BY id
-        LIMIT 2000;
+        ORDER BY id;
         """
         with db.engine.connect() as conn:
             result = conn.execute(text(query))
@@ -241,6 +243,8 @@ def get_rideshare_pay_breakdown_df():
         df[column] = pd.to_numeric(df[column], errors='coerce').astype(float)
 
     return df
+
+# --------------------------------------------------------------------------------
 
 def get_delivery_pay_breakdown_df():
     # Database query to retrieve delivery data
