@@ -9,12 +9,11 @@ matplotlib.use('Agg')  # Use a non-interactive backend
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
-from flask import Flask, jsonify, send_file, send_from_directory
-from flask_caching import Cache
+from flask import jsonify, send_file
 from sqlalchemy import text
 
 # Local application imports
-from app import app, db
+from app import app
 from .utils import *
 
 # --------------------------------------------------------------------------------

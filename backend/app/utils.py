@@ -9,7 +9,6 @@ import time
 # Third-party imports
 import numpy as np
 import pandas as pd
-from flask_caching import Cache
 from sqlalchemy import text
 
 # Local application imports
