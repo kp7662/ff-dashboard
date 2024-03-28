@@ -8,7 +8,7 @@
   
     async function fetchAffiliationData(affiliation) {
       // Simulate fetching data based on the selected affiliation
-      console.log(`Fetching data for ${affiliation}`);
+      // console.log(`Fetching data for ${affiliation}`);
       // Here you would typically make an API call to your backend to fetch the data
       // For demonstration, we're just logging to the console
     }
