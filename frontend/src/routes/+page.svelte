@@ -13,9 +13,10 @@ import { selectedAffiliation } from '../lib/stores/store';
 
 let title = "FF Admin Dashboard";
 
-// Auto-subscribe to the store for console log. This removes the need for the manual subscription used earlier.
+// Auto-subscribe to the store for console log.
 $: console.log('Affiliation in +page.svelte:', $selectedAffiliation);
 </script>
+
 
 <svelte:head>
   <title>{title}</title>
@@ -27,8 +28,8 @@ $: console.log('Affiliation in +page.svelte:', $selectedAffiliation);
 </Breadcrumb>
 
 <div class="mb-8">
-  <DropDownMenu />
-  <!-- <p>Selected Affiliation: {$selectedAffiliation}</p> -->
+  <h5 style="display: inline-block; margin-right: 10px;">Select an Affiliation:</h5>
+  <DropDownMenu style="display: inline-block;" />
 </div>
 
 <div
@@ -36,13 +37,13 @@ $: console.log('Affiliation in +page.svelte:', $selectedAffiliation);
   grid-rows-2 md:grid-cols-4 grid-rows-2 gap-4"
 >
   <!-- <AverageDurationCard class="row-span-2" cardTitle="Average Trip Duration" /> -->
-  <StableStatsCard cardTitle="Total Number of Rideshare Drivers Sign-ups" />
-  <StableStatsCard cardTitle="Total Number of Delivery Drivers Sign-ups" />
-  <StableStatsCard cardTitle="Average Take Rate" />
-  <StableStatsCard cardTitle="Survey Results on “fair” take vs real" />
-  <StableStatsCard cardTitle="Average Pay per Mile" />
-  <StableStatsCard cardTitle="Average Pay per Minute/Hour" />
-  <StableStatsCard cardTitle="Customer Rate per Mile/Minute" />
+  <StableStatsCard cardTitle="Total Sign-ups (Rideshare)" />
+  <StableStatsCard cardTitle="Total Sign-ups (Delivery)" />
+  <StableStatsCard cardTitle="Average Hourly Base Pay vs Minimum Wage" />
+  <StableStatsCard cardTitle="Survey Results on “fair” take vs real (Rideshare)" />
+  <StableStatsCard cardTitle="Average Tips per Delivery Order" />
+  <StableStatsCard cardTitle="Average Pay per Min" />
+  <StableStatsCard cardTitle="XXX" />
   <StableStatsCard cardTitle="XXX" />
 </div>
 
@@ -50,53 +51,3 @@ $: console.log('Affiliation in +page.svelte:', $selectedAffiliation);
   <StackedColumnChart />
   <MonthlyPayChart affiliation={$selectedAffiliation} />
 </div>
-
-
-<!-- <script> -->
-  <!-- // import StableStatsCard from "../lib/StableStatsCard.svelte"
-  // import StackedColumnChart from "../lib/StackedColumnChart.svelte"
-  // import MonthlyPayChart from "../lib/MonthlyPayChart.svelte"
-  // import DropDownMenu from "../lib/DropDownMenu.svelte";
-
-  // import { Row, Breadcrumb, BreadcrumbItem } from "@sveltestrap/sveltestrap";
-  // import AverageDurationCard from "../lib/AverageDurationCard.svelte";
-
-  // import { AdminDashStore } from "../lib/stores/store";
-
-  // export let data;
-
-  // const { stats } = data;
-
-  // console.log("[+page.svelte] avgTripDuration: ", stats.averageTripDuration);
-  // console.log('[+page.svelte] Loaded: Time Page');
-
-  // AdminDashStore.set({ -->
-  <!-- //   ...AdminDashStore,
-  //   averageTripDuration: stats.averageTripDuration,
-  // });
-
-  // $: console.log(
-  //   "[+page.svelte] AdminDashStore: ",
-  //   $AdminDashStore.averageTripDuration,
-  // );
-
-  // this promise/fetch is now dependent on the store, and will re-fetch
-  // whenever $AdminDashStore.limit changes
-  // look (online) for something like 'svete fetch dependent on store' and I'm
-  // sure you'll find resources!
-  // $: averageTripDurationPromise = fetch(
-  //   "http://localhost:5000/rideshare/average-trip-duration",
-  //   { -->
-  <!-- //     method: "POST",
-  //     body: JSON.stringify({ limit: $AdminDashStore.limit || null }),
-  //   },
-  // ).then((r) => (r.ok ? r.json() : r.text()));
-
-  // $: averageTripDuration = $averageTripDurationPromise.then((d) => { -->
-  <!-- //   console.log("[+page.svelte] avgTripDuration (from store): ", d);
-  //   return d;
-  // });
-
-//   let title = "FF Admin Dashboard";
-
-</script> -->
