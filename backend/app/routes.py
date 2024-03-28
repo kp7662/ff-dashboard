@@ -26,8 +26,8 @@ def hello():
 
 @app.route('/rideshare-data')
 def rideshare_data_route():
-    # rideshare_df = get_rideshare_data(date_filter='7d', start_date=None, end_date=None)
-    rideshare_df = get_rideshare_data(date_filter=None, start_date='2024-01-01', end_date='2024-03-01')
+    rideshare_df = get_rideshare_data(date_filter='6m', start_date=None, end_date=None)
+    # rideshare_df = get_rideshare_data(date_filter=None, start_date='2024-01-01', end_date='2024-03-01')
     # Convert DataFrame to JSON or other desired format for the response
     rideshare_data = rideshare_df.to_dict(orient='records')
     return jsonify({"rideshare_data": rideshare_data})

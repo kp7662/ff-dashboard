@@ -109,7 +109,7 @@ def get_rideshare_data(date_filter='7d', start_date=None, end_date=None):
     df['pay_per_mile'] = np.where(df['distance'] != 0, df['current_pay'] / df['distance'], np.nan)
 
     # Cache the processed DataFrame
-    cache.set(cache_key, df.to_json(orient='split'), timeout=3600) # Can adjust TTL later
+    cache.set(cache_key, df.to_json(orient='split'), timeout=30 * 24 * 3600) # TTL = One month
 
     return df
 
