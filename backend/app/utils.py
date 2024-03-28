@@ -375,24 +375,3 @@ def get_delivery_pay_breakdown_df(date_filter='7d', start_date=None, end_date=No
         df[column] = pd.to_numeric(df[column], errors='coerce').fillna(0.0).astype(float)
 
     return df
-
-
-
-def get_delivery_pay_breakdown_df_old():
-    # Database query to retrieve delivery data
-    query = """
-    SELECT id, income_fees, income_pay, income_tips, income_bonus
-    FROM public.argyle_driver_activities
-    WHERE type = 'delivery'
-    ORDER BY id
-    LIMIT 10000;
-    """
-    with db.engine.connect() as conn:
-        result = conn.execute(text(query))
-        df = pd.DataFrame(result.fetchall(), columns=result.keys())
-    
-    # Convert columns to float
-    for column in ['income_fees', 'income_pay', 'income_tips', 'income_bonus']:
-        df[column] = pd.to_numeric(df[column], errors='coerce').astype(float)
-
-    return df
