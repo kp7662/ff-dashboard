@@ -1,5 +1,6 @@
 # backend/app/routes.py
 from flask import Flask, jsonify, send_file, send_from_directory
+from flask_caching import Cache
 from app import app, db
 from sqlalchemy import text
 from .utils import *
@@ -28,22 +29,20 @@ def hello():
 
 @app.route('/rideshare-data')
 def rideshare_data_route():
-    rideshare_df = get_rideshare_df()
+    rideshare_df = get_rideshare_data_by_period(period='1m')
     # Convert DataFrame to JSON or other desired format for the response
     rideshare_data = rideshare_df.to_dict(orient='records')
     return jsonify({"rideshare_data": rideshare_data})
 
-
 @app.route('/rideshare/average-trip-duration')
 def average_trip_duration():
-    rideshare_df = get_rideshare_df()
-    average_trip_duration = rideshare_df['duration'].mean()
+    average_trip_duration = get_rideshare_avg_trip_duration()
     average_trip_duration_rounded = round(average_trip_duration, 2)
     return jsonify({"average_trip_duration": average_trip_duration_rounded})
 
-@app.route('/monthly-pay')
+@app.route('/rideshare/monthly-pay')
 def rideshare_monthly_pay():
-    rideshare_df = get_rideshare_df()  # Assuming this function retrieves your DataFrame
+    rideshare_df = get_rideshare_monthly_pay()
 
     # Formula to calculate monthly average pay:
     rideshare_df['datetime'] = pd.to_datetime(rideshare_df['start_datetime'])
