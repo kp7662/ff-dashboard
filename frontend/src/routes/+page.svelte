@@ -28,8 +28,7 @@ $: console.log('Affiliation in +page.svelte:', $selectedAffiliation);
 
 <div class="mb-8">
   <DropDownMenu />
-  <!-- Using auto-subscription for displaying the selected affiliation -->
-  <p>Selected Affiliation: {$selectedAffiliation}</p>
+  <!-- <p>Selected Affiliation: {$selectedAffiliation}</p> -->
 </div>
 
 <div
