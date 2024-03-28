@@ -17,7 +17,7 @@
   // Function to fetch data from the backend
   async function fetchData() {
     try {
-      const response = await fetch('http://localhost:5000/monthly-pay');
+      const response = await fetch('http://localhost:5000/rideshare/monthly-pay');
       const json = await response.json();
       data = json.monthly_average_pay;
     } catch (error) {
@@ -51,6 +51,7 @@
   }
 </script>
 
+<div class="flex flex-col items-center w-full bg-white rounded-lg shadow-xl p-4">
 <svg
   width={width}
   height={height}
@@ -100,3 +101,4 @@
     <path fill="none" stroke="steelblue" stroke-width="5" d={line(data)} />
   {/if}
 </svg>
+</div>
