@@ -1,5 +1,8 @@
 import { derived, writable } from 'svelte/store';
 
+// default affiliation
+export const selectedAffiliation = writable('CIDU'); 
+
 const defaultAdminDash = {
   averageFareTakeValue: 0,
   limit: 10,

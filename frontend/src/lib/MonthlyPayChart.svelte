@@ -1,7 +1,7 @@
 <!-- https://svelte.dev/repl/3ad4a548a4c442b69f20c25021ac8fbf?version=4.1.0 -->
 
 <script>
-  import { onMount } from 'svelte';
+  import { onMount, afterUpdate} from 'svelte';
   import * as d3 from 'd3';
 
   // Define variables to hold data and chart dimensions
@@ -15,21 +15,49 @@
   let xAxisLabelPadding = 60; // Padding between x-axis labels and x-axis line
 
   // Function to fetch data from the backend
+  // Uncomment this to revert changes
+  // async function fetchData() {
+  //   try {
+  //     const response = await fetch('http://localhost:5000/rideshare/monthly-pay');
+  //     const json = await response.json();
+  //     data = json.monthly_average_pay;
+  //   } catch (error) {
+  //     console.error('Error fetching data:', error);
+  //   }
+  // }
+
+  // // Fetch data when the component mounts
+  // onMount(() => {
+  //   fetchData();
+  // });
+
+  // ---------------------------------------------------------------------------------------------
+  // Function to fetch data based on affiliation
+  export let affiliation;
+
+  let error = ''; // State for storing potential fetch errors
+
   async function fetchData() {
-    try {
-      const response = await fetch('http://localhost:5000/rideshare/monthly-pay');
-      const json = await response.json();
-      data = json.monthly_average_pay;
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
+      console.log(`Fetching data for affiliation: ${affiliation}`);
+      try {
+          const response = await fetch(`http://localhost:5000/rideshare/monthly-pay?affiliation=${affiliation}`);
+          if (!response.ok) {
+              throw new Error(`Error: ${response.statusText}`);
+          }
+          const json = await response.json();
+          data = json.monthly_average_pay;
+          console.log('Data fetched successfully:', data);
+      } catch (err) {
+          console.error('Error fetching data:', err);
+          error = err.message; // Update error state
+      }
   }
 
-  // Fetch data when the component mounts
-  onMount(() => {
-    fetchData();
-  });
+  onMount(fetchData);
 
+  $: affiliation, fetchData();
+
+  // -----------------------------------------------------------------------------
   // Define scales and line generator
   let xScale, yScale, line;
 
