@@ -14,8 +14,8 @@
         <a href="https://geekyants.com/">GeekyAnts</a>
       </div>
       <div>
-        <a href="#">Privacy Policy</a>
-        <a href="#">Terms &amp; Conditions</a>
+        <a href="/">Privacy Policy</a>
+        <a href="/">Terms &amp; Conditions</a>
       </div>
     </div>
   </Container>
