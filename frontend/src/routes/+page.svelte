@@ -6,6 +6,7 @@ import StableStatsCard from "../lib/StableStatsCard.svelte";
 import StackedColumnChart from "../lib/StackedColumnChart.svelte";
 import MonthlyPayChart from "../lib/MonthlyPayChart.svelte";
 import DropDownMenu from "../lib/DropDownMenu.svelte";
+import DateRangePicker from "../lib/DateRangePicker.svelte"
 
 import { Row, Breadcrumb, BreadcrumbItem } from "@sveltestrap/sveltestrap";
 
@@ -30,6 +31,11 @@ $: console.log('Affiliation in +page.svelte:', $selectedAffiliation);
 <div class="mb-8">
   <h5 style="display: inline-block; margin-right: 10px;">Select an Affiliation:</h5>
   <DropDownMenu style="display: inline-block;" />
+</div>
+
+<div class="mb-8" style="display: flex; align-items: center;">
+  <h5 style="margin-right: 10px;">Pick a Date Range:</h5>
+  <DateRangePicker />
 </div>
 
 <div
