@@ -1,3 +1,5 @@
+<!-- https://flowbite.com/docs/plugins/datepicker/#date-range-picker -->
+<!-- frontend/src/lib/DateRangePicker.svelte -->
 <script>
   import { onMount } from 'svelte';
   let startDate = '';
