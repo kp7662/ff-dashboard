@@ -2,22 +2,34 @@
 <!-- frontend/src/lib/DateRangePicker.svelte -->
 <script>
   import { onMount } from 'svelte';
-  let startDate = '';
-  let endDate = '';
+  import { startDate, endDate } from '../lib/stores/store';
+
+  let start = '';
+  let end = '';
 
   // Placeholder for potential date picker initialization
   onMount(() => {
-    // Here you can initialize any JS-based date picker library if you wish,
-    // and bind it to the input fields.
+    // Initialize start and end dates from the store if available
+    startDate.subscribe(value => {
+      start = value;
+      // console.log('Start Date:', start);
+    });
+    endDate.subscribe(value => {
+      end = value;
+      // console.log('End Date:', end);
+    });
   });
 
   // Example function to handle date changes
   // Update based on the date picker library's API if using one
   function updateDateRange() {
     // Logic to handle date range updates, e.g., ensuring start is before end
-    if (new Date(startDate) > new Date(endDate)) {
-      endDate = startDate;
+    if (new Date(start) > new Date(end)) {
+      end = start;
     }
+    // Update the store values
+    startDate.set(start);
+    endDate.set(end);
   }
 </script>
 
@@ -28,7 +40,7 @@
         <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z"/>
       </svg>
     </div>
-    <input bind:value={startDate} type="date" on:change={updateDateRange} class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Select date start">
+    <input bind:value={start} type="date" on:change={updateDateRange} class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Select date start">
   </div>
   <span class="mx-4 text-gray-500">to</span>
   <div class="relative">
@@ -37,7 +49,6 @@
         <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z"/>
       </svg>
     </div>
-    <input bind:value={endDate} type="date" on:change={updateDateRange} class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Select date end">
+    <input bind:value={end} type="date" on:change={updateDateRange} class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Select date end">
   </div>
 </div>
-

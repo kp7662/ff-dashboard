@@ -3,6 +3,12 @@ import { derived, writable } from 'svelte/store';
 // default affiliation
 export const selectedAffiliation = writable('CIDU'); 
 
+// Default values for start_date and end_date
+export const startDate = writable('');
+export const endDate = writable('');
+
+
+//////////
 const defaultAdminDash = {
   averageFareTakeValue: 0,
   limit: 10,

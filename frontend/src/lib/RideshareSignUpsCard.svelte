@@ -1,6 +1,6 @@
 <script>
 import { Card, CardBody } from '@sveltestrap/sveltestrap';
-import { selectedAffiliation } from '../lib/stores/store';
+import { selectedAffiliation, startDate, endDate } from '../lib/stores/store';
 
 export let cardTitle = "";
 let totalSignUps = 'Loading...'; // Placeholder text while fetching data
@@ -8,8 +8,12 @@ let lastUpdated = 'Fetching...'; // Placeholder for the last updated time
 
 const fetchData = async () => {
     const affiliation = $selectedAffiliation; // Get the selected affiliation from the store
+    const start = $startDate; // Get the selected start date from the store
+    const end = $endDate; // Get the selected end date from the store
     console.log("Fetching data for affiliation:", affiliation);
-    const url = `http://localhost:5000/rideshare-sign-ups?affiliation=${affiliation}`; // Construct the URL with the selected affiliation
+    console.log("Start Date:", start);
+    console.log("End Date:", end);
+    const url = `http://localhost:5000/rideshare-sign-ups?affiliation=${affiliation}&start_date=${start}&end_date=${end}`; // Construct the URL with the selected affiliation, start_date, and end_date
     console.log("URL:", url);
     const response = await fetch(url); // Fetch data from the constructed URL
     const data = await response.json();
@@ -25,9 +29,11 @@ const fetchData = async () => {
 // Fetch data initially when the component is mounted
 fetchData();
 
-// Watch for changes in the selected affiliation and update totalSignUps accordingly
+// Watch for changes in the selected affiliation, start_date, and end_date and update totalSignUps accordingly
 $: {
     console.log("Selected affiliation changed:", $selectedAffiliation);
+    console.log("Start Date changed:", $startDate);
+    console.log("End Date changed:", $endDate);
     fetchData();
 }
 </script>
@@ -49,4 +55,3 @@ $: {
     </div>
 </CardBody>
 </Card>
-  
