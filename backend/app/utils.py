@@ -108,6 +108,12 @@ def get_rideshare_data(date_filter='7d', start_date=None, end_date=None):
     df['current_pay'] = df['income_pay'] + df['income_bonus']  # Exclude tips from current pay
     df['pay_per_mile'] = np.where(df['distance'] != 0, df['current_pay'] / df['distance'], np.nan)
 
+    # Fetch and clean affiliations
+    df_affiliations = fetch_and_clean_affiliations()
+
+    # Merge the affiliations with the rideshare data
+    df = df.merge(df_affiliations, how='left', left_on='account', right_on='argyle_account').drop('argyle_account', axis=1)
+    
     # Cache the processed DataFrame
     cache.set(cache_key, df.to_json(orient='split'), timeout=30 * 24 * 3600) # TTL = One month
 
@@ -409,3 +415,30 @@ def clean_user_affiliations(affiliations):
     cleaned_strings = ["unaffiliated" if pd.isnull(s) else s for s in cleaned_strings]
     cleaned_strings = [make_snake_case(s) for s in cleaned_strings if s is not None]
     return cleaned_strings
+
+def fetch_and_clean_affiliations():
+    """
+    Fetches user affiliations from the database, cleans them, and returns a DataFrame
+    mapping argyle_account to affiliation.
+
+    Returns:
+    - DataFrame with columns ['argyle_account', 'affiliation'].
+    """
+    affiliation_query = text("""
+    SELECT argyle_account, raw_user_meta_data
+    FROM public.user_meta_data;
+    """)
+
+    with db.engine.connect() as conn:
+        affiliation_result = conn.execute(affiliation_query)
+        df_affiliations = pd.DataFrame(affiliation_result.fetchall(), columns=affiliation_result.keys())
+
+    # Process affiliations
+    df_affiliations['affiliations_list'] = df_affiliations['raw_user_meta_data'].apply(lambda x: x.get('affiliation', []) if isinstance(x, dict) else [])
+    cleaned_affiliations = df_affiliations['affiliations_list'].apply(clean_user_affiliations)
+    df_affiliations['affiliation'] = cleaned_affiliations.apply(lambda x: x[0] if x else 'unaffiliated')
+
+    # Keep only necessary columns
+    df_affiliations = df_affiliations[['argyle_account', 'affiliation']]
+    
+    return df_affiliations

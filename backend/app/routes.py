@@ -25,37 +25,9 @@ def hello():
 
 # --------------------------------------------------------------------------------
 
-@app.route("/affiliations")
-def affiliations():
-    query = text("""
-    SELECT user_id, raw_user_meta_data
-    FROM public.user_meta_data;
-    """)
-
-    with db.engine.connect() as conn:
-        result = conn.execute(query)
-        df_user_metadata = pd.DataFrame(result.fetchall(), columns=result.keys())
-
-    df_user_metadata['affiliations_list'] = df_user_metadata['raw_user_meta_data'].apply(lambda x: x.get('affiliation', []) if isinstance(x, dict) else [])
-
-    # Apply cleaning logic to affiliations
-    cleaned_affiliations = df_user_metadata['affiliations_list'].apply(clean_user_affiliations)
-    
-    # Assume each user only has one affiliation for simplicity
-    df_user_metadata['cleaned_affiliation'] = cleaned_affiliations.apply(lambda x: x[0] if x else 'unaffiliated')
-
-    # Prepare and return JSON response
-    response_data = [
-        {"user_id": row["user_id"], "cleaned_affiliation": row["cleaned_affiliation"]}
-        for _, row in df_user_metadata.iterrows()
-    ]
-    return jsonify(response_data)
-
-# --------------------------------------------------------------------------------
-
 @app.route('/rideshare-data')
 def rideshare_data_route():
-    rideshare_df = get_rideshare_data(date_filter='7d', start_date=None, end_date=None)
+    rideshare_df = get_rideshare_data(date_filter='3m', start_date=None, end_date=None)
     # rideshare_df = get_rideshare_data(date_filter=None, start_date='2024-01-01', end_date='2024-03-01')
     # Convert DataFrame to JSON or other desired format for the response
     rideshare_data = rideshare_df.to_dict(orient='records')
@@ -231,6 +203,34 @@ def generate_map_for_user(user_id, date_filter='1m', start_date=None, end_date=N
 
     # Return the map's HTML representation
     return m._repr_html_()
+
+# --------------------------------------------------------------------------------
+
+@app.route("/affiliations")
+def affiliations():
+    query = text("""
+    SELECT argyle_account, raw_user_meta_data
+    FROM public.user_meta_data;
+    """)
+
+    with db.engine.connect() as conn:
+        result = conn.execute(query)
+        df_user_metadata = pd.DataFrame(result.fetchall(), columns=result.keys())
+
+    df_user_metadata['affiliations_list'] = df_user_metadata['raw_user_meta_data'].apply(lambda x: x.get('affiliation', []) if isinstance(x, dict) else [])
+
+    # Apply cleaning logic to affiliations
+    cleaned_affiliations = df_user_metadata['affiliations_list'].apply(clean_user_affiliations)
+    
+    # Assume each user only has one affiliation for simplicity
+    df_user_metadata['cleaned_affiliation'] = cleaned_affiliations.apply(lambda x: x[0] if x else 'unaffiliated')
+
+    # Prepare and return JSON response
+    response_data = [
+        {"argyle_account": row["argyle_account"], "cleaned_affiliation": row["cleaned_affiliation"]}
+        for _, row in df_user_metadata.iterrows()
+    ]
+    return jsonify(response_data)
 
 # --------------------------------------------------------------------------------
 
