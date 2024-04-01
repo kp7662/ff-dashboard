@@ -374,3 +374,38 @@ def get_delivery_pay_breakdown_df(date_filter='7d', start_date=None, end_date=No
         df[column] = pd.to_numeric(df[column], errors='coerce').fillna(0.0).astype(float)
 
     return df
+
+# --------------------------------------------------------------------------------
+# The following functions are adapted from https://github.com/Princeton-HCI/ff-analysis/blob/7ee9c04106f35cb3a60eb87a3d22f72f9c4316d7/workflow/scripts/utils.py
+
+def make_snake_case(s):
+    import re
+    return re.sub(r'\W+', '_', s.strip()).lower()
+
+def load_json_safe(x):
+    import json
+    try:
+        return json.loads(x)
+    except json.JSONDecodeError as e:
+        print(f"JSONDecodeError for: {x} - Error: {e}")  # Log error and problematic string
+        return {}
+    except TypeError as e:
+        print(f"TypeError for: {x} - Error: {e}")  # Log error and problematic string
+        return {}
+    
+# --------------------------------------------------------------------------------
+
+# The following function is adapted from: https://github.com/Princeton-HCI/ff-analysis/blob/7ee9c04106f35cb3a60eb87a3d22f72f9c4316d7/workflow/scripts/02-load-db-dump.py
+
+def clean_user_affiliations(affiliations):
+    driver_org_translation_dict = {
+        "RDU/Rideshare Drivers United": "Rideshare Drivers United",
+        "Drivers Union / Teamsters 117": "Drivers Union",
+    }
+    affiliation_strings = [
+        a["name"] if isinstance(a, dict) else a for a in affiliations
+    ]
+    cleaned_strings = [driver_org_translation_dict.get(a, a) for a in affiliation_strings]
+    cleaned_strings = ["unaffiliated" if pd.isnull(s) else s for s in cleaned_strings]
+    cleaned_strings = [make_snake_case(s) for s in cleaned_strings if s is not None]
+    return cleaned_strings
