@@ -35,7 +35,7 @@ $: console.log('Affiliation in +page.svelte:', $selectedAffiliation);
 </div>
 
 <div class="mb-8" style="display: flex; align-items: center;">
-  <h5 style="margin-right: 10px;">Pick a Date Range:</h5>
+  <h5 style="margin-right: 10px;">Select a Date Range:</h5>
   <DateRangePicker />
 </div>
 

@@ -22,6 +22,7 @@ function handleAffiliationChange(event) {
 onMount(() => {
     selectedAffiliation.subscribe((value) => {
         selectedAffiliationLabel = value || 'Select Affiliation';
+        // console.log('Selected affiliation changed to:', value);
     });
 });
 </script>
@@ -65,7 +66,7 @@ onMount(() => {
             hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full text-left">Unaffiliated</button>
         </li>
         <li>
-        <button data-affiliation="" on:click={handleAffiliationChange} class="block px-4 py-2 
+        <button data-affiliation="All" on:click={handleAffiliationChange} class="block px-4 py-2 
             hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full text-left">All</button>
         </li>
     </ul>
