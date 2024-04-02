@@ -42,19 +42,21 @@ def rideshare_data_route():
 def rideshare_sign_ups():
     # Generate the current timestamp as the last updated time
     last_updated = datetime.utcnow().strftime('%m/%d/%y')
-    
-    # Get the affiliation parameter from the request URL
+
+    # Get the affiliation, start_date, and end_date parameters from the request URL
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
     affiliation = request.args.get('affiliation')
-    
-    # Call get_rideshare_data() function with the affiliation parameter
-    rideshare_df = get_rideshare_data(date_filter='3m', start_date=None, end_date=None, affiliation=affiliation)
+
+    # Call get_rideshare_data() function with the affiliation, start_date, and end_date parameters
+    rideshare_df = get_rideshare_data(date_filter='3m', start_date=start_date, end_date=end_date, affiliation=affiliation)
     rideshare_data = rideshare_df.to_dict(orient='records')
 
     unique_accounts = {data['account'] for data in rideshare_data}
-    
+
     # Calculate the total number of unique accounts
     total_sign_ups = len(unique_accounts)
-    
+
     return jsonify({'total_sign_ups': total_sign_ups, 'last_updated': last_updated})
 
 # --------------------------------------------------------------------------------
