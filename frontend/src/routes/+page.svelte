@@ -8,6 +8,7 @@ import StackedColumnChart from "../lib/StackedColumnChart.svelte";
 import MonthlyPayChart from "../lib/MonthlyPayChart.svelte";
 import DropDownMenu from "../lib/DropDownMenu.svelte";
 import DateRangePicker from "../lib/DateRangePicker.svelte"
+import AverageTipsPerDelivery from "../lib/AverageTipsPerDeliveryCard.svelte"
 
 import { Row, Breadcrumb, BreadcrumbItem } from "@sveltestrap/sveltestrap";
 
@@ -48,7 +49,7 @@ $: console.log('Affiliation in +page.svelte:', $selectedAffiliation);
   <StableStatsCard cardTitle="Total Sign-ups (Delivery)" />
   <StableStatsCard cardTitle="Average Hourly Base Pay vs Minimum Wage" />
   <StableStatsCard cardTitle="Survey Results on “fair” take vs real (Rideshare)" />
-  <StableStatsCard cardTitle="Average Tips per Delivery Order" />
+  <AverageTipsPerDelivery cardTitle="Average Tips per Delivery Order" />
   <StableStatsCard cardTitle="Average Pay per Min" />
   <StableStatsCard cardTitle="XXX" />
   <StableStatsCard cardTitle="XXX" />
