@@ -140,7 +140,7 @@ def get_rideshare_data(date_filter='7d', start_date=None, end_date=None, affilia
 
 # --------------------------------------------------------------------------------
 
-def get_delivery_data(date_filter='7d', start_date=None, end_date=None):
+def get_delivery_data(date_filter='7d', start_date=None, end_date=None, affiliation=None):
     """
     Fetches and returns delivery data as a DataFrame, based on either a predefined period
     or specific start and end dates provided by the user.
@@ -150,16 +150,17 @@ def get_delivery_data(date_filter='7d', start_date=None, end_date=None):
                          Used only if start_date and end_date are not provided.
     - start_date (str or None): The start date for data filtering in 'YYYY-MM-DD' format.
     - end_date (str or None): The end date for data filtering in 'YYYY-MM-DD' format.
+    - affiliation (str or None): The affiliation to filter the data. Options: 'CIDU', 'RDU', 'DU', 'CDU', 'DDA', 'Unaffiliated', 'All'.
 
     Returns:
     - DataFrame: Processed delivery data for the requested period or date range.
     """
 
-    # Determine cache key based on input parameters
+    # Determine cache key based on input parameters and affiliation
     if start_date and end_date:
-        cache_key = f'delivery_data_custom_{start_date}_{end_date}'
+        cache_key = f'delivery_data_custom_{start_date}_{end_date}_{affiliation}'
     else:
-        cache_key = f'delivery_data_{date_filter}'
+        cache_key = f'delivery_data_{date_filter}_{affiliation}'
 
     # Start measuring time
     start_time = time.time()
@@ -230,10 +231,131 @@ def get_delivery_data(date_filter='7d', start_date=None, end_date=None):
     df['current_pay'] = df['income_pay'] + df['income_bonus']  # Exclude tips from current pay
     df['pay_per_mile'] = np.where(df['distance'] != 0, df['current_pay'] / df['distance'], np.nan)
 
+    # Fetch and clean affiliations
+    df_affiliations = fetch_and_clean_affiliations()
+
+    # Merge the affiliations with the rideshare data
+    df = df.merge(df_affiliations, how='left', left_on='account', right_on='argyle_account').drop('argyle_account', axis=1)
+    
+    # Apply affiliation filter if provided
+    if affiliation is not None:
+        if affiliation == 'CIDU':
+            df = df[df['affiliation'] == 'colorado_independent_drivers_united']
+        elif affiliation == 'RDU':
+            df = df[df['affiliation'] == 'rideshare_drivers_united']
+        elif affiliation == 'DU':
+            df = df[df['affiliation'] == 'drivers_union']
+        elif affiliation == 'CDU':
+            df = df[df['affiliation'] == 'connecticut_drivers_united']
+        elif affiliation == 'DDA':
+            df = df[df['affiliation'] == 'dmv_drivers_alliance']
+        elif affiliation == 'Unaffiliated':
+            df = df[df['affiliation'] == 'unaffiliated']
+        elif affiliation == 'All':
+            pass  # Do not filter the DataFrame
+        else:
+            raise ValueError("Invalid affiliation parameter. Options: 'CIDU', 'RDU', 'DU', 'CDU', 'DDA', 'Unaffiliated', 'All'")
+
     # Cache the processed DataFrame
-    cache.set(cache_key, df.to_json(orient='split'), timeout=3600) # Can adjust TTL later
+    cache.set(cache_key, df.to_json(orient='split'), timeout=30 * 24 * 3600) # TTL = One month
 
     return df
+
+
+# def get_delivery_data(date_filter='7d', start_date=None, end_date=None):
+#     """
+#     Fetches and returns delivery data as a DataFrame, based on either a predefined period
+#     or specific start and end dates provided by the user.
+
+#     Parameters:
+#     - date_filter (str): A predefined period for data retrieval ('7d', '1m', '3m', '6m', '1y').
+#                          Used only if start_date and end_date are not provided.
+#     - start_date (str or None): The start date for data filtering in 'YYYY-MM-DD' format.
+#     - end_date (str or None): The end date for data filtering in 'YYYY-MM-DD' format.
+
+#     Returns:
+#     - DataFrame: Processed delivery data for the requested period or date range.
+#     """
+
+#     # Determine cache key based on input parameters
+#     if start_date and end_date:
+#         cache_key = f'delivery_data_custom_{start_date}_{end_date}'
+#     else:
+#         cache_key = f'delivery_data_{date_filter}'
+
+#     # Start measuring time
+#     start_time = time.time()
+    
+#     # Try to fetch from cache first
+#     cached_data = cache.get(cache_key)
+#     if cached_data is not None:
+#         cache_duration = time.time() - start_time
+#         logger.info(f"Cache hit for {cache_key}. Loaded data from cache in {cache_duration:.2f} seconds.")
+#         return pd.read_json(StringIO(cached_data), orient='split')
+
+#     # If cache miss, query the database based on the provided dates or period    
+#     if start_date and end_date:
+#         # Convert string dates to datetime objects
+#         start_date = pd.to_datetime(start_date)
+#         end_date = pd.to_datetime(end_date)
+#     else:
+#         # Calculate start_date and end_date based on the period
+#         end_date = datetime.now()
+#         if date_filter == '7d':
+#             start_date = end_date - timedelta(days=7)
+#         elif date_filter == '1m':
+#             start_date = end_date - timedelta(days=30)
+#         elif date_filter == '3m':
+#             start_date = end_date - timedelta(days=91)
+#         elif date_filter == '6m':
+#             start_date = end_date - timedelta(days=182)
+#         elif date_filter == '1y':
+#             start_date = end_date - timedelta(days=365)
+#         else:
+#             start_date = end_date - timedelta(days=7)  # Default case
+
+#     logger.info(f"Cache miss for {cache_key}. Querying database...")
+    
+#     # Reset start time for measuring database query duration
+#     db_start_time = time.time()
+    
+#     query = """
+#     SELECT id, account, employer, created_at, updated_at, status, type,
+#     all_datetimes_request_at, duration, timezone, earning_type, 
+#     start_location_lat, start_location_lng, start_location_formatted_address, 
+#     end_location_lat, end_location_lng, end_location_formatted_address, distance, 
+#     distance_unit, metadata, circumstances_is_pool, circumstances_is_surge, 
+#     circumstances_service_type, circumstances_position, income_currency, 
+#     income_total_charge, income_fees, income_total, income_pay, income_tips,
+#     income_bonus, metadata_origin_id, end_datetime, start_datetime, task_count, 
+#     income_other, user 
+#     FROM public.argyle_driver_activities
+#     WHERE type = 'delivery' AND
+#     start_datetime::timestamp >= :start_date AND
+#     start_datetime::timestamp <= :end_date
+#     ORDER BY id;
+#     """
+#     with db.engine.connect() as conn:
+#         result = conn.execute(text(query), {'start_date': start_date, 'end_date': end_date})
+#         df = pd.DataFrame(result.fetchall(), columns=result.keys())
+
+#     # Calculate and log time taken for database operations
+#     db_duration = time.time() - db_start_time
+#     logger.info(f"Loaded data from database in {db_duration:.2f} seconds.")
+
+#     # Preprocess the data
+
+#     # Replace 0 or None in 'distance' with NaN (if needed)
+#     df['distance'] = df['distance'].replace(0, np.nan).fillna(np.nan)
+
+#     df['income_total_charge'] = df['income_fees'] + df['income_total']
+#     df['current_pay'] = df['income_pay'] + df['income_bonus']  # Exclude tips from current pay
+#     df['pay_per_mile'] = np.where(df['distance'] != 0, df['current_pay'] / df['distance'], np.nan)
+
+#     # Cache the processed DataFrame
+#     cache.set(cache_key, df.to_json(orient='split'), timeout=3600) # Can adjust TTL later
+
+#     return df
 
 # --------------------------------------------------------------------------------
 

@@ -36,6 +36,17 @@ def rideshare_data_route():
     rideshare_data = rideshare_df.to_dict(orient='records')
     return jsonify({"rideshare_data": rideshare_data})
 
+@app.route('/delivery-data')
+def delivery_data_route():
+    # Get the affiliation parameter from the request URL
+    affiliation = request.args.get('affiliation')
+
+    delivery_df = get_delivery_data(date_filter='3m', start_date=None, end_date=None , affiliation=affiliation)
+    # delivery_df = get_delivery_data(date_filter=None, start_date='2024-01-01', end_date='2024-03-01')
+    # Convert DataFrame to JSON or other desired format for the response
+    delivery_data = delivery_df.to_dict(orient='records')
+    return jsonify({"delivery_data": delivery_data})
+
 # --------------------------------------------------------------------------------
 
 @app.route('/rideshare-sign-ups')
