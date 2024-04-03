@@ -27,7 +27,8 @@ def hello():
 
 @app.route('/rideshare-data')
 def rideshare_data_route():
-    # Get the affiliation parameter from the request URL
+    # start_date = request.args.get('start_date')
+    # end_date = request.args.get('end_date')
     affiliation = request.args.get('affiliation')
 
     rideshare_df = get_rideshare_data(date_filter='3m', start_date=None, end_date=None , affiliation=affiliation)
@@ -38,7 +39,8 @@ def rideshare_data_route():
 
 @app.route('/delivery-data')
 def delivery_data_route():
-    # Get the affiliation parameter from the request URL
+    # start_date = request.args.get('start_date')
+    # end_date = request.args.get('end_date')
     affiliation = request.args.get('affiliation')
 
     delivery_df = get_delivery_data(date_filter='3m', start_date=None, end_date=None , affiliation=affiliation)
@@ -69,6 +71,53 @@ def rideshare_sign_ups():
     total_sign_ups = len(unique_accounts)
 
     return jsonify({'total_sign_ups': total_sign_ups, 'last_updated': last_updated})
+
+# --------------------------------------------------------------------------------
+
+from flask import jsonify, request
+import numpy as np  # Ensure numpy is imported for NaN checks
+
+@app.route('/average-tips-per-delivery')
+def average_tips_per_delivery():
+    # Extract query parameters for affiliation, start_date, and end_date
+    affiliation = request.args.get('affiliation')
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+
+    # Fetch delivery data using the get_delivery_data function for the specific affiliation
+    delivery_df = get_delivery_data(start_date=start_date, end_date=end_date, affiliation=affiliation)
+
+    # Ensure income_total_charge is not zero to avoid division by zero errors for percentage calculation
+    valid_delivery_df = delivery_df[delivery_df['income_total_charge'] != 0]
+
+    # Calculation 1: Average Tip Value per Delivery Order
+    if not delivery_df.empty:
+        average_tip_value = round(delivery_df['income_tips'].sum() / len(delivery_df), 2)
+    else:
+        average_tip_value = 0
+
+    # Calculation 2: Percentage of Average Tip per Delivery Order
+    if not valid_delivery_df.empty:
+        valid_delivery_df['tip_percentage'] = (valid_delivery_df['income_tips'] / valid_delivery_df['income_total_charge']) * 100
+        tip_percentage_mean = valid_delivery_df['tip_percentage'].mean()
+        average_tip_percentage = round(tip_percentage_mean) if not pd.isna(tip_percentage_mean) else 0
+    else:
+        average_tip_percentage = 0
+
+    # Fetch aggregate statistics for the same timeframe
+    aggregate_stats = get_aggregate_stats(start_date=start_date, end_date=end_date)
+    aggregate_tip_value = round(aggregate_stats["aggregate_tip_value"], 2)
+    # Ensure that aggregate_tip_percentage is not NaN before rounding
+    aggregate_tip_percentage = round(aggregate_stats["aggregate_tip_percentage"]) if not np.isnan(aggregate_stats["aggregate_tip_percentage"]) else 0
+
+    # Return the calculated values along with aggregate stats in JSON format
+    return jsonify({
+        "average_tip_value_per_delivery_order": average_tip_value,
+        "average_tip_percentage_per_delivery_order": average_tip_percentage,
+        "aggregate_tip_value": aggregate_tip_value,
+        "aggregate_tip_percentage": aggregate_tip_percentage,
+    })
+
 
 # --------------------------------------------------------------------------------
 
