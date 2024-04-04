@@ -17,9 +17,9 @@
         // console.log("URL:", url);
         const response = await fetch(url); // Fetch data from the constructed URL
         const data = await response.json();
-        console.log("Received data:", data);
+        // console.log("Received data:", data);
         average_pay_per_minute_delivery = `USD ${data.average_pay_per_minute_delivery}`;
-        console.log("average_pay_per_min: ", average_pay_per_minute_delivery);
+        // console.log("average_pay_per_min: ", average_pay_per_minute_delivery);
         aggregate_pay_per_minute_delivery = `USD ${data.aggregate_pay_per_minute_delivery}`;
     };
     

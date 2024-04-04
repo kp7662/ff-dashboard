@@ -17,9 +17,9 @@
         // console.log("URL:", url);
         const response = await fetch(url); // Fetch data from the constructed URL
         const data = await response.json();
-        console.log("Received data:", data);
+        // console.log("Received data:", data);
         average_pay_per_minute_rideshare = `USD ${data.average_pay_per_minute_rideshare}`;
-        console.log("average_pay_per_min: ", average_pay_per_minute_rideshare);
+        // console.log("average_pay_per_min: ", average_pay_per_minute_rideshare);
         aggregate_pay_per_minute_rideshare = `USD ${data.aggregate_pay_per_minute_rideshare}`;
     };
     

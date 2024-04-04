@@ -18,7 +18,7 @@
         // console.log("URL:", url);
         const response = await fetch(url); // Fetch data from the constructed URL
         const data = await response.json();
-        console.log("Received data:", data);
+        // console.log("Received data:", data);
         average_tip_percentage = `${data.average_tip_percentage_per_delivery_order}%`; // Append "%" sign
         average_tip_value = `USD ${data.average_tip_value_per_delivery_order}`; // Prefix "USD"
         aggregate_tip_value = `USD ${data.aggregate_tip_value}`;

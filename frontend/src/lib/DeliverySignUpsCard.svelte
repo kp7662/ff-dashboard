@@ -17,7 +17,7 @@
         // console.log("URL:", url);
         const response = await fetch(url); // Fetch data from the constructed URL
         const data = await response.json();
-        console.log("Received data:", data);
+        // console.log("Received data:", data);
         totalSignUps = data.total_sign_ups; // Display the raw number of total sign-ups
         lastUpdated = new Date(data.last_updated).toLocaleDateString('en-US', {
         year: '2-digit',
