@@ -74,8 +74,28 @@ def rideshare_sign_ups():
 
 # --------------------------------------------------------------------------------
 
-from flask import jsonify, request
-import numpy as np  # Ensure numpy is imported for NaN checks
+@app.route('/delivery-sign-ups')
+def delivery_sign_ups():
+    # Generate the current timestamp as the last updated time
+    last_updated = datetime.utcnow().strftime('%m/%d/%y')
+
+    # Get the affiliation, start_date, and end_date parameters from the request URL
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+    affiliation = request.args.get('affiliation')
+
+    # Call get_delivery_data() function with the affiliation, start_date, and end_date parameters
+    delivery_df = get_delivery_data(date_filter='3m', start_date=start_date, end_date=end_date, affiliation=affiliation)
+    delivery_data = delivery_df.to_dict(orient='records')
+
+    unique_accounts = {data['account'] for data in delivery_data}
+
+    # Calculate the total number of unique accounts
+    total_sign_ups = len(unique_accounts)
+
+    return jsonify({'total_sign_ups': total_sign_ups, 'last_updated': last_updated})
+
+# --------------------------------------------------------------------------------
 
 @app.route('/average-tips-per-delivery')
 def average_tips_per_delivery():
@@ -118,7 +138,57 @@ def average_tips_per_delivery():
         "aggregate_tip_percentage": aggregate_tip_percentage,
     })
 
+# --------------------------------------------------------------------------------
 
+@app.route('/average-pay-per-min')
+def average_pay_per_min():
+    # Extract query parameters for affiliation, start_date, and end_date
+    affiliation = request.args.get('affiliation')
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+
+    # Fetch delivery data using the get_delivery_data function for the specific affiliation
+    delivery_df = get_delivery_data(start_date=start_date, end_date=end_date, affiliation=affiliation)
+    rideshare_df = get_rideshare_data(start_date=start_date, end_date=end_date, affiliation=affiliation)
+
+    # Ensure duration is not zero to avoid division by zero errors
+    valid_delivery_df = delivery_df[delivery_df['duration'] > 0]
+
+    # Calculation: Average Pay per Minute for the specified affiliation
+    if not valid_delivery_df.empty:
+        # Convert duration from seconds to minutes
+        valid_delivery_df['duration_min'] = valid_delivery_df['duration'] / 60
+        # Calculate pay per minute
+        valid_delivery_df['pay_per_min'] = valid_delivery_df['income_total'] / valid_delivery_df['duration_min']
+        average_pay_per_minute_delivery = round(valid_delivery_df['pay_per_min'].mean(), 2)
+    else:
+        average_pay_per_minute_delivery = 0
+
+    valid_rideshare_df = rideshare_df[rideshare_df['duration'] > 0]
+
+    if not valid_rideshare_df.empty:
+        # Convert duration from seconds to minutes
+        valid_rideshare_df['duration_min'] = valid_rideshare_df['duration'] / 60
+        # Calculate pay per minute
+        valid_rideshare_df['pay_per_min'] = valid_rideshare_df['income_total'] / valid_rideshare_df['duration_min']
+        average_pay_per_minute_rideshare = round(valid_rideshare_df['pay_per_min'].mean(), 2)
+    else:
+        average_pay_per_minute_rideshare = 0
+
+    # Fetch aggregate statistics for the same timeframe across all affiliations
+    aggregate_stats = get_aggregate_stats(start_date=start_date, end_date=end_date)
+
+    # Extract the aggregate pay per minute from the aggregate statistics
+    aggregate_pay_per_minute_delivery = aggregate_stats.get("aggregate_pay_per_minute_delivery", 2)
+    aggregate_pay_per_minute_rideshare = aggregate_stats.get("aggregate_pay_per_minute_rideshare", 2)
+
+    # Return the calculated value along with aggregate stats in JSON format
+    return jsonify({
+        "average_pay_per_minute_delivery": average_pay_per_minute_delivery,
+        "average_pay_per_minute_rideshare": average_pay_per_minute_rideshare,
+        "aggregate_pay_per_minute_delivery": aggregate_pay_per_minute_delivery,
+        "aggregate_pay_per_minute_rideshare": aggregate_pay_per_minute_rideshare
+    })
 # --------------------------------------------------------------------------------
 
 @app.route('/rideshare/average-trip-duration')
