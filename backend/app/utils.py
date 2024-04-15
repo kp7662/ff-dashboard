@@ -2,7 +2,12 @@
 
 # Standard library imports
 from datetime import datetime, timedelta
-from io import StringIO
+from io import StringIO, BytesIO
+from sqlalchemy import create_engine, text
+from plotnine import (element_text, ggtitle, aes, ggplot, scale_x_discrete, geom_violin,
+                      geom_point, geom_boxplot, scale_fill_manual, scale_y_continuous, theme, theme_classic,
+                      position_jitter, labs, ylim, ggsave)
+from mizani.formatters import percent_format
 import logging
 import time
 
@@ -13,6 +18,7 @@ from sqlalchemy import text
 
 # Local application imports
 from app import app, db, cache, logger
+# --------------------------------------------------------------------------------
 
 logger = logging.getLogger(__name__)
 
@@ -550,3 +556,95 @@ def fetch_and_clean_affiliations():
     df_affiliations = df_affiliations[['argyle_account', 'affiliation']]
     
     return df_affiliations
+
+# --------------------------------------------------------------------------------
+
+# The following function is adapted from: https://github.com/Princeton-HCI/ff-analysis/blob/main/workflow/notebooks/reports/survey.py.ipynb
+
+# Function to load data using SQL
+def load_data_from_sql():
+    query = """
+    SELECT id, user_id, estimate, fair, max_take, average_take FROM public.driver_survey_1 ORDER BY id
+    """
+    with db.engine.connect() as conn:
+        result = conn.execute(text(query))
+        df = pd.DataFrame(result.fetchall(), columns=result.keys())
+    return df
+
+def prepare_data(df):
+    cols_to_numeric = ['average_take', 'max_take', 'estimate', 'fair']
+    df[cols_to_numeric] = df[cols_to_numeric].apply(pd.to_numeric, errors='coerce')
+
+    df["take_rate"] = df["average_take"]
+    df["max_take"] = df["max_take"]
+    df['estimate'] = df['estimate']
+    df['fair'] = df['fair']
+
+    df = df.dropna(subset=cols_to_numeric)
+
+    df = df.rename(
+        columns={
+            "take_rate": "Actual average fee %",
+            "estimate": "Driver estimates of\naverage fees",
+            "fair": "What drivers said\nwould be a fair fee",
+            "max_take": "Highest fee taken\nfrom a driver's fare",
+        }
+    )
+
+    df = pd.melt(
+        df,
+        id_vars=["user_id"],
+        value_vars=[
+            "Driver estimates of\naverage fees",
+            "What drivers said\nwould be a fair fee",
+            "Actual average fee %",
+            "Highest fee taken\nfrom a driver's fare",
+        ]
+    )
+
+    df["value"] = df["value"].astype(float) / 100  # Scale down if values were too large
+    df.replace([np.inf, -np.inf], np.nan, inplace=True)
+    df.dropna(subset=["value"], inplace=True)
+
+    return df
+
+def create_plot(df):
+    # print(df['value'].describe())  # To see a quick statistical summary for debugging
+
+    plot = (
+        ggplot(df, aes(x='variable', y='value', fill='variable'))
+        + geom_violin()
+        + geom_boxplot(width=0.1)
+        + geom_point(aes(y='value'), position=position_jitter(width=0.1))
+        + scale_fill_manual(values=["#fbb4ae", "#b3cde3", "#ccebc5", "#decbe4"])
+        + scale_x_discrete(
+            limits=[
+                "Driver estimates of\naverage fees",
+                "What drivers said\nwould be a fair fee",
+                "Actual average fee %",
+                "Highest fee taken\nfrom a driver's fare",
+            ]
+        )
+        + theme_classic()
+        + theme(legend_position='none')
+        + scale_y_continuous(
+            limits=[0, 0.7],
+            breaks=[0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7],
+            labels=percent_format(),
+        )
+        + labs(
+            x="",
+            y="% Fee",
+            title="Driver perception of Uber fees",
+            subtitle="Drivers' perceptions mirror the maximum fees taken from their fares,\nwhile the fair fee they want is less than what platforms take.\n",
+            caption="Fee % includes taxes and insurance.\nCalculated using data from an average of 20 trips. \nAll trips used for this plot were taken in the past 6 months."
+        )
+        + theme(plot_caption=element_text(hjust=0, size=8))
+    )
+
+    image_stream = BytesIO()
+    plot.save(image_stream, format='png', width=10, height=6, dpi=300)
+    image_stream.seek(0)
+    return image_stream
+
+# --------------------------------------------------------------------------------

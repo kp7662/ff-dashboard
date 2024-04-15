@@ -17,6 +17,15 @@ from sqlalchemy import text
 from app import app
 from .utils import *
 
+
+@app.route('/view-plot')
+def view_plot():
+    df = load_data_from_sql()
+    prepared_data = prepare_data(df)
+    image_stream = create_plot(prepared_data)
+    return send_file(image_stream, mimetype='image/png', as_attachment=False)
+
+
 # --------------------------------------------------------------------------------
 
 @app.route("/rand")
