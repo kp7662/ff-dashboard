@@ -4,7 +4,7 @@
 <script>
 import StableStatsCard from "../lib/StableStatsCard.svelte";
 import StackedColumnChart from "../lib/StackedColumnChart.svelte";
-import MonthlyPayChart from "../lib/MonthlyPayChart.svelte";
+import ViolinPlot from "../lib/ViolinPlot.svelte";
 import DropDownMenu from "../lib/DropDownMenu.svelte";
 import DateRangePicker from "../lib/DateRangePicker.svelte"
 import RideshareSignUpsCard from "../lib/RideshareSignUpsCard.svelte";
@@ -59,5 +59,5 @@ $: console.log('Affiliation in +page.svelte:', $selectedAffiliation);
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
   <StackedColumnChart />
-  <!-- <MonthlyPayChart affiliation={$selectedAffiliation} /> -->
+  <ViolinPlot />
 </div>
