@@ -290,16 +290,16 @@ def get_aggregate_stats(start_date, end_date):
 
     # Calculate Aggregate Tip Value
     if not delivery_df.empty:
-        aggregate_tip_value = delivery_df['income_tips'].sum() / len(delivery_df)
+        aggregate_tip_value_delivery = delivery_df['income_tips'].sum() / len(delivery_df)
     else:
-        aggregate_tip_value = 0
+        aggregate_tip_value_delivery = 0
 
     # Calculate Aggregate Tip Percentage
     if not valid_delivery_df_for_tips.empty:
         valid_delivery_df_for_tips['tip_percentage'] = (valid_delivery_df_for_tips['income_tips'] / valid_delivery_df_for_tips['income_total_charge']) * 100
-        aggregate_tip_percentage = valid_delivery_df_for_tips['tip_percentage'].mean()
+        aggregate_tip_percentage_delivery = valid_delivery_df_for_tips['tip_percentage'].mean()
     else:
-        aggregate_tip_percentage = 0
+        aggregate_tip_percentage_delivery = 0
 
     # Ensure duration is not zero for pay per minute calculation
     valid_delivery_df_for_pay = delivery_df[delivery_df['duration'] > 0]
@@ -324,8 +324,8 @@ def get_aggregate_stats(start_date, end_date):
 
     # Return the aggregate statistics as a JSON-serializable dictionary
     return {
-        "aggregate_tip_value": aggregate_tip_value,
-        "aggregate_tip_percentage": aggregate_tip_percentage,
+        "aggregate_tip_value_delivery": aggregate_tip_value_delivery,
+        "aggregate_tip_percentage_delivery": aggregate_tip_percentage_delivery,
         "aggregate_pay_per_minute_delivery": aggregate_pay_per_minute_delivery,
         "aggregate_pay_per_minute_rideshare": aggregate_pay_per_minute_rideshare
     }
@@ -635,8 +635,8 @@ def create_plot(df):
         + labs(
             x="",
             y="% Fee",
-            title="Driver perception of Uber fees",
-            subtitle="Drivers' perceptions mirror the maximum fees taken from their fares,\nwhile the fair fee they want is less than what platforms take.\n",
+            # title="Driver perception of Uber fees",
+            # subtitle="Drivers' perceptions mirror the maximum fees taken from their fares,\nwhile the fair fee they want is less than what platforms take.\n",
             caption="Fee % includes taxes and insurance.\nCalculated using data from an average of 20 trips. \nAll trips used for this plot were taken in the past 6 months."
         )
         + theme(plot_caption=element_text(hjust=0, size=8))

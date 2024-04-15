@@ -127,16 +127,16 @@ def average_tips_per_delivery():
 
     # Fetch aggregate statistics for the same timeframe
     aggregate_stats = get_aggregate_stats(start_date=start_date, end_date=end_date)
-    aggregate_tip_value = round(aggregate_stats["aggregate_tip_value"], 2)
-    # Ensure that aggregate_tip_percentage is not NaN before rounding
-    aggregate_tip_percentage = round(aggregate_stats["aggregate_tip_percentage"]) if not np.isnan(aggregate_stats["aggregate_tip_percentage"]) else 0
+    aggregate_tip_value_delivery = round(aggregate_stats["aggregate_tip_value_delivery"], 2)
+    # Ensure that aggregate_tip_percentage_delivery is not NaN before rounding
+    aggregate_tip_percentage_delivery = round(aggregate_stats["aggregate_tip_percentage_delivery"]) if not np.isnan(aggregate_stats["aggregate_tip_percentage_delivery"]) else 0
 
     # Return the calculated values along with aggregate stats in JSON format
     return jsonify({
         "average_tip_value_per_delivery_order": average_tip_value,
         "average_tip_percentage_per_delivery_order": average_tip_percentage,
-        "aggregate_tip_value": aggregate_tip_value,
-        "aggregate_tip_percentage": aggregate_tip_percentage,
+        "aggregate_tip_value_delivery": aggregate_tip_value_delivery,
+        "aggregate_tip_percentage_delivery": aggregate_tip_percentage_delivery,
     })
 
 # --------------------------------------------------------------------------------
