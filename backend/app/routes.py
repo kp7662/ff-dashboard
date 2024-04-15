@@ -2,6 +2,7 @@
 # Standard library imports
 import random
 import json
+import base64
 
 # Third-party libraries
 import folium
@@ -10,27 +11,18 @@ matplotlib.use('Agg')  # Use a non-interactive backend
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
-from flask import jsonify, send_file, request
+from flask import jsonify, send_file, request, redirect
 from sqlalchemy import text
 
 # Local application imports
 from app import app
 from .utils import *
 
-
-@app.route('/view-plot')
-def view_plot():
-    df = load_data_from_sql()
-    prepared_data = prepare_data(df)
-    image_stream = create_plot(prepared_data)
-    return send_file(image_stream, mimetype='image/png', as_attachment=False)
-
-
 # --------------------------------------------------------------------------------
 
-@app.route("/rand")
-def hello():
-    return str(random.randint(0, 100))
+@app.route("/")
+def home():
+    return redirect("http://localhost:5173/")
 
 # --------------------------------------------------------------------------------
 
@@ -267,6 +259,18 @@ def pay_breakdown():
 
     # Return the data as JSON
     return jsonify(data)
+
+# --------------------------------------------------------------------------------
+
+@app.route('/view-plot')
+def view_plot():
+    df = load_data_from_sql()
+    prepared_data = prepare_data(df)
+    image_stream = create_plot(prepared_data)
+    
+    image_stream.seek(0)  # Go to the beginning of the stream
+    base64_data = base64.b64encode(image_stream.read()).decode('utf-8')
+    return jsonify({'image': 'data:image/png;base64,' + base64_data})
 
 # --------------------------------------------------------------------------------
 
