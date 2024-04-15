@@ -21,7 +21,7 @@
         console.log("Received data:", data);
         average_tip_percentage = `${data.average_tip_percentage_per_delivery_order}%`; // Append "%" sign
         average_tip_value = `USD ${data.average_tip_value_per_delivery_order}`; // Prefix "USD"
-        aggregate_tip_value = `USD ${data.aggregate_tip_value}`;
+        aggregate_tip_value = `USD ${data.aggregate_tip_value_delivery}`;
     };
     
     // Fetch data initially when the component is mounted
