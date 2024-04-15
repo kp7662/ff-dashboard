@@ -287,19 +287,33 @@ def get_aggregate_stats(start_date, end_date):
 
     # Ensure income_total_charge is not zero to avoid division by zero errors for tip percentage calculation
     valid_delivery_df_for_tips = delivery_df[delivery_df['income_total_charge'] != 0]
+    valid_rideshare_df_for_tips = rideshare_df[rideshare_df['income_total_charge'] != 0]
 
-    # Calculate Aggregate Tip Value
+    # Calculate Aggregate Tip Value (Delivery)
     if not delivery_df.empty:
         aggregate_tip_value_delivery = delivery_df['income_tips'].sum() / len(delivery_df)
     else:
         aggregate_tip_value_delivery = 0
 
-    # Calculate Aggregate Tip Percentage
+    # Calculate Aggregate Tip Percentage (Delivery)
     if not valid_delivery_df_for_tips.empty:
         valid_delivery_df_for_tips['tip_percentage'] = (valid_delivery_df_for_tips['income_tips'] / valid_delivery_df_for_tips['income_total_charge']) * 100
         aggregate_tip_percentage_delivery = valid_delivery_df_for_tips['tip_percentage'].mean()
     else:
         aggregate_tip_percentage_delivery = 0
+
+    # Calculate Aggregate Tip Value (Rideshare)
+    if not rideshare_df.empty:
+        aggregate_tip_value_rideshare = rideshare_df['income_tips'].sum() / len(rideshare_df)
+    else:
+        aggregate_tip_value_rideshare = 0
+
+    # Calculate Aggregate Tip Percentage (Rideshare)
+    if not valid_rideshare_df_for_tips.empty:
+        valid_rideshare_df_for_tips['tip_percentage'] = (valid_rideshare_df_for_tips['income_tips'] / valid_rideshare_df_for_tips['income_total_charge']) * 100
+        aggregate_tip_percentage_rideshare = valid_rideshare_df_for_tips['tip_percentage'].mean()
+    else:
+        aggregate_tip_percentage_rideshare = 0
 
     # Ensure duration is not zero for pay per minute calculation
     valid_delivery_df_for_pay = delivery_df[delivery_df['duration'] > 0]
@@ -326,6 +340,8 @@ def get_aggregate_stats(start_date, end_date):
     return {
         "aggregate_tip_value_delivery": aggregate_tip_value_delivery,
         "aggregate_tip_percentage_delivery": aggregate_tip_percentage_delivery,
+        "aggregate_tip_value_rideshare": aggregate_tip_value_rideshare,
+        "aggregate_tip_percentage_rideshare": aggregate_tip_percentage_rideshare,
         "aggregate_pay_per_minute_delivery": aggregate_pay_per_minute_delivery,
         "aggregate_pay_per_minute_rideshare": aggregate_pay_per_minute_rideshare
     }

@@ -1,8 +1,5 @@
-<!-- https://github.com/consultingninja/svelteTemplateProject/blob/main/src/App.svelte -->
-
 <!-- frontend/src/routes/+page.svelte -->
 <script>
-import StableStatsCard from "../lib/StableStatsCard.svelte";
 import StackedColumnChart from "../lib/StackedColumnChart.svelte";
 import ViolinPlot from "../lib/ViolinPlot.svelte";
 import DropDownMenu from "../lib/DropDownMenu.svelte";
@@ -10,10 +7,11 @@ import DateRangePicker from "../lib/DateRangePicker.svelte"
 import RideshareSignUpsCard from "../lib/RideshareSignUpsCard.svelte";
 import DeliverySignUpsCard from "../lib/DeliverySignUpsCard.svelte";
 import AverageTipsPerDelivery from "../lib/AverageTipsPerDeliveryCard.svelte"
+import AverageTipsPerRideshare from "../lib/AverageTipsPerRideshareCard.svelte"
 import AveragePayPerMinDelivery from "../lib/AveragePayPerMinDeliveryCard.svelte"
 import AveragePayPerMinRideshare from "../lib/AveragePayPerMinRideshareCard.svelte"
 
-import { Row, Breadcrumb, BreadcrumbItem } from "@sveltestrap/sveltestrap";
+import { Breadcrumb, BreadcrumbItem } from "@sveltestrap/sveltestrap";
 
 import { selectedAffiliation } from '../lib/stores/store';
 
@@ -47,14 +45,13 @@ $: console.log('Affiliation in +page.svelte:', $selectedAffiliation);
   class="grid grid-cols-1
   grid-rows-2 md:grid-cols-3 grid-rows-2 gap-3"
 >
-  <!-- <AverageDurationCard class="row-span-2" cardTitle="Average Trip Duration" /> -->
-  <RideshareSignUpsCard cardTitle="Total Sign-ups (Rideshare)" />
-  <DeliverySignUpsCard cardTitle="Total Sign-ups (Delivery)" />
-  <StableStatsCard cardTitle="Survey Results on “fair” take vs real (Rideshare)" />
-  <AverageTipsPerDelivery cardTitle="Average Tips per Delivery Order" />
+  <RideshareSignUpsCard cardTitle="Total Drivers Sign-ups (Rideshare)" />
+  <AverageTipsPerRideshare cardTitle="Average Tips per Order (Rideshare)" />
   <AveragePayPerMinRideshare cardTitle="Average Pay per Minute (Rideshare)" />
+
+  <DeliverySignUpsCard cardTitle="Total Drivers Sign-ups (Delivery)" />
+  <AverageTipsPerDelivery cardTitle="Average Tips per Order (Delivery)" />
   <AveragePayPerMinDelivery cardTitle="Average Pay per Minute (Delivery)" />
-  <!-- <StableStatsCard cardTitle="Average Hourly Base Pay vs Minimum Wage" /> -->
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
