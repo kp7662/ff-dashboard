@@ -6,6 +6,7 @@ export const selectedAffiliation = writable('CIDU');
 // Default values for start_date and end_date
 export const startDate = writable('');
 export const endDate = writable('');
+export const showSpinner = writable(false);
 
 
 //////////
