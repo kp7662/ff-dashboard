@@ -38,18 +38,19 @@ $: {
 }
 </script>
 
-<Card class="flex flex-col border-0 shadow-lg">
+<Card class="flex flex-col border-0 shadow-lg font-sans">
 <CardBody class="p-4">
     <div class="flex items-center justify-between">
-    <div class="text-lg font-semibold">{cardTitle}</div>
+    <div class="text-xl font-semibold">{cardTitle}</div>
     </div>
 
-    <div class="text-4xl font-bold my-3">{totalSignUps}</div>
-
+    <div class="text-5xl font-bold my-3">
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-emerald-600">{totalSignUps}</span>
+    </div>
     <!-- Display the last updated time -->
-    <div class="flex justify-between items-center mb-2">
+    <div class="flex justify-between items-center mb-2 text-base">
     <div>Last Updated</div>
-    <div class="flex items-center text-green-500">
+    <div class="flex items-center text-green-500 text-base">
         {lastUpdated}
     </div>
     </div>

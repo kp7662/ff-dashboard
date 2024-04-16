@@ -39,35 +39,28 @@ onMount(() => {
 </button>
 
 <!-- Dropdown menu -->
-<div id="dropdownHover" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
-    <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownHoverButton">
+<div id="dropdownHover" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-64 dark:bg-gray-700">
+    <ul class="py-2 text-base text-gray-700 dark:text-gray-200" aria-labelledby="dropdownHoverButton">
         <li>
-        <button data-affiliation="CIDU" on:click={handleAffiliationChange} class="block px-4 py-2 
-            hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full text-left">CIDU</button>
+            <button data-affiliation="CIDU" on:click={handleAffiliationChange} class="block px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full text-left">CIDU</button>
         </li>
         <li>
-        <button data-affiliation="RDU" on:click={handleAffiliationChange} class="block px-4 py-2 
-            hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full text-left">RDU</button>
+            <button data-affiliation="RDU" on:click={handleAffiliationChange} class="block px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full text-left">RDU</button>
         </li>
         <li>
-        <button data-affiliation="DU" on:click={handleAffiliationChange} class="block px-4 py-2 
-            hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full text-left">DU</button>
+            <button data-affiliation="DU" on:click={handleAffiliationChange} class="block px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full text-left">DU</button>
         </li>
         <li>
-        <button data-affiliation="CDU" on:click={handleAffiliationChange} class="block px-4 py-2 
-            hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full text-left">CDU</button>
+            <button data-affiliation="CDU" on:click={handleAffiliationChange} class="block px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full text-left">CDU</button>
         </li>
         <li>
-        <button data-affiliation="DDA" on:click={handleAffiliationChange} class="block px-4 py-2 
-            hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full text-left">DDA</button>
+            <button data-affiliation="DDA" on:click={handleAffiliationChange} class="block px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full text-left">DDA</button>
         </li>
         <li>
-        <button data-affiliation="Unaffiliated" on:click={handleAffiliationChange} class="block px-4 py-2 
-            hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full text-left">Unaffiliated</button>
+            <button data-affiliation="Unaffiliated" on:click={handleAffiliationChange} class="block px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full text-left">Unaffiliated</button>
         </li>
         <li>
-        <button data-affiliation="All" on:click={handleAffiliationChange} class="block px-4 py-2 
-            hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full text-left">All</button>
+            <button data-affiliation="All" on:click={handleAffiliationChange} class="block px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full text-left">All</button>
         </li>
     </ul>
 </div>

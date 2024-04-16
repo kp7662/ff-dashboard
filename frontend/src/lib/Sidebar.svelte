@@ -28,6 +28,8 @@
     console.log('Toggle Analysis: isAnalysisOpen =', isAnalysisOpen);
     if (isPageOpen === true) isPageOpen = false;
   };
+  
+  $: console.log('Reactivity check: isAnalysisOpen =', isAnalysisOpen);
 
   const togglePages = () => {
     isPageOpen = !isPageOpen;

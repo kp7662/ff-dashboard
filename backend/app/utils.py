@@ -579,12 +579,22 @@ def fetch_and_clean_affiliations():
 
 # Function to load data using SQL
 def load_data_from_sql():
+    # Calculate the date 6 months ago from today
+    six_months_ago = datetime.now() - timedelta(days=182)
+
+    # Write the SQL query with a WHERE clause to filter data from the last 6 months
     query = """
-    SELECT id, user_id, estimate, fair, max_take, average_take FROM public.driver_survey_1 ORDER BY id
+    SELECT id, user_id, estimate, fair, max_take, average_take
+    FROM public.driver_survey_1
+    WHERE created_at >= :six_months_ago
+    ORDER BY id
     """
+
+    # Use a database connection to execute the query
     with db.engine.connect() as conn:
-        result = conn.execute(text(query))
+        result = conn.execute(text(query), {'six_months_ago': six_months_ago})
         df = pd.DataFrame(result.fetchall(), columns=result.keys())
+    
     return df
 
 def prepare_data(df):
@@ -653,7 +663,7 @@ def create_plot(df):
             y="% Fee",
             # title="Driver perception of Uber fees",
             # subtitle="Drivers' perceptions mirror the maximum fees taken from their fares,\nwhile the fair fee they want is less than what platforms take.\n",
-            caption="Fee % includes taxes and insurance.\nCalculated using data from an average of 20 trips. \nAll trips used for this plot were taken in the past 6 months."
+            caption="Fee % includes taxes and insurance. \nAll trips used for this plot were taken in the past 6 months."
         )
         + theme(plot_caption=element_text(hjust=0, size=8))
     )
