@@ -8,8 +8,10 @@ from plotnine import (element_text, ggtitle, aes, ggplot, scale_x_discrete, geom
                       geom_point, geom_boxplot, scale_fill_manual, scale_y_continuous, theme, theme_classic,
                       position_jitter, labs, ylim, ggsave)
 from mizani.formatters import percent_format
+from redis.exceptions import RedisError
 import logging
 import time
+import pickle
 
 # Third-party imports
 import numpy as np
@@ -576,13 +578,22 @@ def fetch_and_clean_affiliations():
 # --------------------------------------------------------------------------------
 
 # The following function is adapted from: https://github.com/Princeton-HCI/ff-analysis/blob/main/workflow/notebooks/reports/survey.py.ipynb
-
-# Function to load data using SQL
 def load_data_from_sql():
     # Calculate the date 6 months ago from today
     six_months_ago = datetime.now() - timedelta(days=182)
+    cache_key = f"data-{six_months_ago.strftime('%Y-%m-%d')}"
 
-    # Write the SQL query with a WHERE clause to filter data from the last 6 months
+    try:
+        # Check if data is in cache
+        cached_data = cache.get(cache_key)
+        if cached_data is not None:
+            # print("Using cached data")
+            df = pickle.loads(cached_data)
+            return df
+    except RedisError as e:
+        print(f"Failed to retrieve from cache: {e}")
+
+    # print("Querying database")
     query = """
     SELECT id, user_id, estimate, fair, max_take, average_take
     FROM public.driver_survey_1
@@ -590,11 +601,16 @@ def load_data_from_sql():
     ORDER BY id
     """
 
-    # Use a database connection to execute the query
     with db.engine.connect() as conn:
         result = conn.execute(text(query), {'six_months_ago': six_months_ago})
         df = pd.DataFrame(result.fetchall(), columns=result.keys())
     
+    try:
+        # Cache the DataFrame
+        cache.set(cache_key, pickle.dumps(df), timeout=3600)  # cache for 1 hour
+    except RedisError as e:
+        print(f"Failed to save to cache: {e}")
+
     return df
 
 def prepare_data(df):
