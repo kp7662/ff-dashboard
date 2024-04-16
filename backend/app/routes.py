@@ -1,7 +1,6 @@
 # backend/app/routes.py
 # Standard library imports
 import random
-import json
 import base64
 
 # Third-party libraries
@@ -168,53 +167,60 @@ def average_tips_per_delivery():
 
 @app.route('/average-pay-per-min')
 def average_pay_per_min():
-    # Extract query parameters for affiliation, start_date, and end_date
     affiliation = request.args.get('affiliation')
     start_date = request.args.get('start_date')
     end_date = request.args.get('end_date')
 
-    # Fetch delivery data using the get_delivery_data function for the specific affiliation
+    cache_key = f"average-pay-per-min_{affiliation}_{start_date}_{end_date}"
+    
+    # Attempt to fetch cached results
+    try:
+        cached_results = cache.get(cache_key)
+        if cached_results:
+            return jsonify(pickle.loads(cached_results))
+    except RedisError as e:
+        app.logger.error(f"Cache miss for {cache_key}: {e}")
+
     delivery_df = get_delivery_data(start_date=start_date, end_date=end_date, affiliation=affiliation)
     rideshare_df = get_rideshare_data(start_date=start_date, end_date=end_date, affiliation=affiliation)
 
-    # Ensure duration is not zero to avoid division by zero errors
-    valid_delivery_df = delivery_df[delivery_df['duration'] > 0]
+    # Create a copy of the slices to avoid SettingWithCopyWarning
+    valid_delivery_df = delivery_df[delivery_df['duration'] > 0].copy()
+    valid_rideshare_df = rideshare_df[rideshare_df['duration'] > 0].copy()
 
-    # Calculation: Average Pay per Minute for the specified affiliation
     if not valid_delivery_df.empty:
-        # Convert duration from seconds to minutes
         valid_delivery_df['duration_min'] = valid_delivery_df['duration'] / 60
-        # Calculate pay per minute
         valid_delivery_df['pay_per_min'] = valid_delivery_df['income_total'] / valid_delivery_df['duration_min']
         average_pay_per_minute_delivery = round(valid_delivery_df['pay_per_min'].mean(), 2)
     else:
         average_pay_per_minute_delivery = 0
 
-    valid_rideshare_df = rideshare_df[rideshare_df['duration'] > 0]
-
     if not valid_rideshare_df.empty:
-        # Convert duration from seconds to minutes
         valid_rideshare_df['duration_min'] = valid_rideshare_df['duration'] / 60
-        # Calculate pay per minute
         valid_rideshare_df['pay_per_min'] = valid_rideshare_df['income_total'] / valid_rideshare_df['duration_min']
         average_pay_per_minute_rideshare = round(valid_rideshare_df['pay_per_min'].mean(), 2)
     else:
         average_pay_per_minute_rideshare = 0
 
-    # Fetch aggregate statistics for the same timeframe across all affiliations
     aggregate_stats = get_aggregate_stats(start_date=start_date, end_date=end_date)
 
-    # Extract the aggregate pay per minute from the aggregate statistics
-    aggregate_pay_per_minute_delivery = aggregate_stats.get("aggregate_pay_per_minute_delivery", 2)
-    aggregate_pay_per_minute_rideshare = aggregate_stats.get("aggregate_pay_per_minute_rideshare", 2)
+    aggregate_pay_per_minute_delivery = aggregate_stats.get("aggregate_pay_per_minute_delivery", 0)
+    aggregate_pay_per_minute_rideshare = aggregate_stats.get("aggregate_pay_per_minute_rideshare", 0)
 
-    # Return the calculated value along with aggregate stats in JSON format
-    return jsonify({
+    result = {
         "average_pay_per_minute_delivery": average_pay_per_minute_delivery,
         "average_pay_per_minute_rideshare": average_pay_per_minute_rideshare,
         "aggregate_pay_per_minute_delivery": aggregate_pay_per_minute_delivery,
-        "aggregate_pay_per_minute_rideshare": aggregate_pay_per_minute_rideshare
-    })
+        "aggregate_pay_per_minute_rideshare": aggregate_pay_per_minute_rideshare,
+    }
+
+    # Cache the result
+    try:
+        cache.set(cache_key, pickle.dumps(result), timeout=3600)  # Cache for 1 hour
+    except RedisError as e:
+        app.logger.error(f"Failed to cache results: {e}")
+
+    return jsonify(result)
 
 # --------------------------------------------------------------------------------
 

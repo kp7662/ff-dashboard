@@ -46,19 +46,17 @@ def get_rideshare_data(date_filter='3m', start_date=None, end_date=None, affilia
         cache_key = f'rideshare_data_{date_filter}_{affiliation}'
 
     # Start measuring time
-    start_time = time.time()
+    # start_time = time.time()
     
     try:
         # Try to fetch from cache first
         cached_data = cache.get(cache_key)
         if cached_data is not None:
-            cache_duration = time.time() - start_time
-            logger.info(f"Cache hit for {cache_key}. Loaded data from cache in {cache_duration:.2f} seconds.")
+            # cache_duration = time.time() - start_time
+            # logger.info(f"Cache hit for {cache_key}. Loaded data from cache in {cache_duration:.2f} seconds.")
             return pd.read_json(StringIO(cached_data), orient='split')
     except RedisError as e:
-        logger.error(f"Cache access failed: {e}")
-
-    logger.info(f"Cache miss for {cache_key}. Querying database...")
+        logger.error(f"Cache miss for {cache_key}: {e}")
 
     if start_date and end_date:
         start_date = pd.to_datetime(start_date)
@@ -78,9 +76,8 @@ def get_rideshare_data(date_filter='3m', start_date=None, end_date=None, affilia
         else:
             start_date = end_date - timedelta(days=7)  # Default case
 
-    
     # Reset start time for measuring database query duration
-    db_start_time = time.time()
+    # db_start_time = time.time()
     
     query = """
     SELECT id, account, employer, created_at, updated_at, status, type,
@@ -103,8 +100,8 @@ def get_rideshare_data(date_filter='3m', start_date=None, end_date=None, affilia
         df = pd.DataFrame(result.fetchall(), columns=result.keys())
 
     # Calculate and log time taken for database operations
-    db_duration = time.time() - db_start_time
-    logger.info(f"Loaded data from database in {db_duration:.2f} seconds.")
+    # db_duration = time.time() - db_start_time
+    # logger.info(f"Loaded data from database in {db_duration:.2f} seconds.")
 
     # Preprocess the data
 
@@ -172,19 +169,18 @@ def get_delivery_data(date_filter='3m', start_date=None, end_date=None, affiliat
         cache_key = f'delivery_data_{date_filter}_{affiliation}'
 
     # Start measuring time
-    start_time = time.time()
+    # start_time = time.time()
     
     try:
         # Try to fetch from cache first
         cached_data = cache.get(cache_key)
         if cached_data is not None:
-            cache_duration = time.time() - start_time
-            logger.info(f"Cache hit for {cache_key}. Loaded data from cache in {cache_duration:.2f} seconds.")
+            # cache_duration = time.time() - start_time
+            # logger.info(f"Cache hit for {cache_key}. Loaded data from cache in {cache_duration:.2f} seconds.")
             return pd.read_json(StringIO(cached_data), orient='split')
     except RedisError as e:
-        logger.error(f"Cache access failed: {e}")
+        logger.error(f"Cache miss for {cache_key}: {e}")
 
-    logger.info(f"Cache miss for {cache_key}. Querying database...")
     if start_date and end_date:
         start_date = pd.to_datetime(start_date)
         end_date = pd.to_datetime(end_date)
@@ -204,7 +200,7 @@ def get_delivery_data(date_filter='3m', start_date=None, end_date=None, affiliat
             start_date = end_date - timedelta(days=7)  # Default case
     
     # Reset start time for measuring database query duration
-    db_start_time = time.time()
+    # db_start_time = time.time()
     
     query = """
     SELECT id, account, employer, created_at, updated_at, status, type,
@@ -228,8 +224,8 @@ def get_delivery_data(date_filter='3m', start_date=None, end_date=None, affiliat
         df = pd.DataFrame(result.fetchall(), columns=result.keys())
 
     # Calculate and log time taken for database operations
-    db_duration = time.time() - db_start_time
-    logger.info(f"Loaded data from database in {db_duration:.2f} seconds.")
+    # db_duration = time.time() - db_start_time
+    # logger.info(f"Loaded data from database in {db_duration:.2f} seconds.")
 
     # Preprocess the data
 
@@ -292,10 +288,9 @@ def get_aggregate_stats(start_date, end_date):
         # Try to fetch from cache first
         cached_data = cache.get(cache_key)
         if cached_data is not None:
-            logger.error("Yes!")
             return pickle.loads(cached_data)
     except RedisError as e:
-        logger.error(f"Cache access failed: {e}")
+        logger.error(f"Cache miss for {cache_key}: {e}")
 
     # If cache miss, compute the stats
     delivery_df = get_delivery_data(start_date=start_date, end_date=end_date, affiliation='All')
