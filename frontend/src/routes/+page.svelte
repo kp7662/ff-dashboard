@@ -18,9 +18,8 @@ import { selectedAffiliation } from '../lib/stores/store';
 let title = "FF Admin Dashboard";
 
 // Auto-subscribe to the store for console log.
-$: console.log('Affiliation in +page.svelte:', $selectedAffiliation);
+// $: console.log('Affiliation in +page.svelte:', $selectedAffiliation);
 </script>
-
 
 <svelte:head>
   <title>{title}</title>

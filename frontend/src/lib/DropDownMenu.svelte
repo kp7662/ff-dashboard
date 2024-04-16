@@ -12,7 +12,7 @@ let selectedAffiliationLabel = 'CIDU';
 // Function to handle affiliation selection
 function handleAffiliationChange(event) {
     const affiliation = event.target.dataset.affiliation;
-    console.log('Selected affiliation:', affiliation); // Log for debugging
+    // console.log('Selected affiliation:', affiliation); // Log for debugging
     selectedAffiliation.set(affiliation);
     // Update the button label to reflect the selected affiliation
     selectedAffiliationLabel = affiliation || 'Select Affiliation';

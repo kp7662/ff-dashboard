@@ -73,7 +73,7 @@ onMount(async () => {
                             class={`w-full relative flex items-center justify-center ${payItem.color} pay-segment focus:outline-none border-none p-0`} 
                             style="height: {payItem.amount}%;"
                             aria-label={`Show details for ${payItem.type}`}>
-                            <span class="text-xs text-white absolute z-10">{Math.round(payItem.amount)}%</span>
+                            <span class="text-xl font-semibold text-white absolute z-10">{Math.round(payItem.amount)}%</span>
                         </button>
                     {/each}
                 </div>

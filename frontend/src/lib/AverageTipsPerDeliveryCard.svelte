@@ -15,10 +15,10 @@
         // console.log("Start Date:", start);
         // console.log("End Date:", end);
         const url = `http://localhost:5000/average-tips-per-delivery?affiliation=${affiliation}&start_date=${start}&end_date=${end}`; // Construct the URL with the selected affiliation, start_date, and end_date
-        console.log("URL:", url);
+        // console.log("URL:", url);
         const response = await fetch(url); // Fetch data from the constructed URL
         const data = await response.json();
-        console.log("Received data:", data);
+        // console.log("Received data:", data);
         average_tip_percentage = `${data.average_tip_percentage_per_delivery_order}%`; // Append "%" sign
         average_tip_value = `USD ${data.average_tip_value_per_delivery_order}`; // Prefix "USD"
         aggregate_tip_value = `USD ${data.aggregate_tip_value_delivery}`;
@@ -29,9 +29,12 @@
     
     // Watch for changes in the selected affiliation, start_date, and end_date and update totalSignUps accordingly
     $: {
-        console.log("Selected affiliation changed:", $selectedAffiliation);
-        console.log("Start Date changed:", $startDate);
-        console.log("End Date changed:", $endDate);
+        // console.log("Selected affiliation changed:", $selectedAffiliation);
+        // console.log("Start Date changed:", $startDate);
+        // console.log("End Date changed:", $endDate);
+        $selectedAffiliation;
+        $startDate;
+        $endDate;
         fetchData();
     }
 </script>
