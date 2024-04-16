@@ -2,6 +2,7 @@
 <script>
 import StackedColumnChart from "../lib/StackedColumnChart.svelte";
 import ViolinPlot from "../lib/ViolinPlot.svelte";
+import Spinner from "../lib/Spinner.svelte";
 import DropDownMenu from "../lib/DropDownMenu.svelte";
 import DateRangePicker from "../lib/DateRangePicker.svelte"
 import RideshareSignUpsCard from "../lib/RideshareSignUpsCard.svelte";
@@ -25,7 +26,6 @@ let title = "FF Admin Dashboard";
   <title>{title}</title>
 </svelte:head>
 
-
 <nav class="flex flex-col justify-center px-5 py-2 text-gray-700 border border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-800 dark:border-gray-700 mb-4" aria-label="Breadcrumb">
   <ol class="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
     <li aria-current="page">
@@ -36,7 +36,6 @@ let title = "FF Admin Dashboard";
     </li>
   </ol>
 </nav>
-
 
 <div class="border border-gray-200 bg-white rounded-lg p-4 mb-12">
   <h2 class="mb-4 pl-4 text-3xl font-extrabold text-gray-900 dark:text-white md:text-4xl lg:text-5xl">
@@ -54,11 +53,13 @@ let title = "FF Admin Dashboard";
   </div>
 </div>
 
-
 <div class="border border-gray-200 bg-white rounded-lg p-4 mb-12">
-  <h2 class="mb-12 pl-4 text-3xl font-extrabold text-gray-900 dark:text-white md:text-4xl lg:text-5xl">
-    Live Stats
-  </h2>
+  <div class="flex items-center mb-12 pl-4">
+    <h2 class="mr-4 text-3xl font-extrabold text-gray-900 dark:text-white md:text-4xl lg:text-5xl">
+      Live Stats 
+    </h2>
+    <Spinner />
+  </div>
 
   <div
     class="grid grid-cols-1
