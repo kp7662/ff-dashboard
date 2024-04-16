@@ -99,69 +99,63 @@ def delivery_sign_ups():
 
 @app.route('/average-tips-per-delivery')
 def average_tips_per_delivery():
-    # Extract query parameters for affiliation, start_date, and end_date
     affiliation = request.args.get('affiliation')
     start_date = request.args.get('start_date')
     end_date = request.args.get('end_date')
 
-    # Fetch delivery data using the get_delivery_data function for the specific affiliation
-    delivery_df = get_delivery_data(start_date=start_date, end_date=end_date, affiliation=affiliation)
+    cache_key = f"average-tips-per-delivery_{affiliation}_{start_date}_{end_date}"
 
-    # Fetch rideshare data using the get_delivery_data function for the specific affiliation
+    # Attempt to fetch cached results
+    try:
+        cached_results = cache.get(cache_key)
+        if cached_results:
+            return jsonify(pickle.loads(cached_results))
+    except RedisError as e:
+        app.logger.error(f"Cache miss for {cache_key}: {e}")
+
+    delivery_df = get_delivery_data(start_date=start_date, end_date=end_date, affiliation=affiliation)
     rideshare_df = get_rideshare_data(start_date=start_date, end_date=end_date, affiliation=affiliation)
 
-    # Ensure income_total_charge is not zero to avoid division by zero errors for percentage calculation
     valid_delivery_df = delivery_df[delivery_df['income_total_charge'] != 0]
     valid_rideshare_df = rideshare_df[rideshare_df['income_total_charge'] != 0]
 
-    # Calculation 1: Average Tip Value per Delivery Order
-    if not delivery_df.empty:
-        average_tip_value = round(delivery_df['income_tips'].sum() / len(delivery_df), 2)
-    else:
-        average_tip_value = 0
+    average_tip_value = calculate_average_tip(valid_delivery_df, 'income_tips')
+    average_tip_percentage = calculate_tip_percentage(valid_delivery_df)
+    average_tip_value_rideshare = calculate_average_tip(valid_rideshare_df, 'income_tips')
+    average_tip_percentage_rideshare = calculate_tip_percentage(valid_rideshare_df)
 
-    # Calculation 2: Percentage of Average Tip per Delivery Order
-    if not valid_delivery_df.empty:
-        valid_delivery_df['tip_percentage'] = (valid_delivery_df['income_tips'] / valid_delivery_df['income_total_charge']) * 100
-        tip_percentage_mean = valid_delivery_df['tip_percentage'].mean()
-        average_tip_percentage = round(tip_percentage_mean) if not pd.isna(tip_percentage_mean) else 0
-    else:
-        average_tip_percentage = 0
-
-        # Calculation 3: Average Tip Value per Rideshare Order
-    if not rideshare_df.empty:
-        average_tip_value_rideshare = round(rideshare_df['income_tips'].sum() / len(rideshare_df), 2)
-    else:
-        average_tip_value_rideshare = 0
-
-    # Calculation 4: Percentage of Average Tip per Rideshare Order
-    if not valid_rideshare_df.empty:
-        valid_rideshare_df['tip_percentage'] = (valid_rideshare_df['income_tips'] / valid_rideshare_df['income_total_charge']) * 100
-        tip_percentage_mean_rideshare = valid_rideshare_df['tip_percentage'].mean()
-        average_tip_percentage_rideshare = round(tip_percentage_mean_rideshare) if not pd.isna(tip_percentage_mean_rideshare) else 0
-    else:
-        average_tip_percentage_rideshare = 0
-
-    # Fetch aggregate statistics for the same timeframe
     aggregate_stats = get_aggregate_stats(start_date=start_date, end_date=end_date)
-    aggregate_tip_value_delivery = round(aggregate_stats["aggregate_tip_value_delivery"], 2)
-    aggregate_tip_value_rideshare = round(aggregate_stats["aggregate_tip_value_rideshare"], 2)
-    # Ensure that aggregate_tip_percentage_delivery is not NaN before rounding
-    aggregate_tip_percentage_delivery = round(aggregate_stats["aggregate_tip_percentage_delivery"]) if not np.isnan(aggregate_stats["aggregate_tip_percentage_delivery"]) else 0
-    aggregate_tip_percentage_rideshare = round(aggregate_stats["aggregate_tip_percentage_rideshare"]) if not np.isnan(aggregate_stats["aggregate_tip_percentage_rideshare"]) else 0
-
-    # Return the calculated values along with aggregate stats in JSON format
-    return jsonify({
+    result = {
         "average_tip_value_per_delivery_order": average_tip_value,
         "average_tip_percentage_per_delivery_order": average_tip_percentage,
         "average_tip_value_per_rideshare_order": average_tip_value_rideshare,
         "average_tip_percentage_per_rideshare_order": average_tip_percentage_rideshare,
 
-        "aggregate_tip_value_delivery": aggregate_tip_value_delivery,
-        "aggregate_tip_percentage_delivery": aggregate_tip_percentage_delivery,
-        "aggregate_tip_value_rideshare": aggregate_tip_value_rideshare,
-        "aggregate_tip_percentage_rideshare": aggregate_tip_percentage_rideshare,
-    })
+        "aggregate_tip_value_delivery": round(aggregate_stats["aggregate_tip_value_delivery"], 2),
+        "aggregate_tip_percentage_delivery": round(aggregate_stats["aggregate_tip_percentage_delivery"]) if not np.isnan(aggregate_stats["aggregate_tip_percentage_delivery"]) else 0,
+        "aggregate_tip_value_rideshare": round(aggregate_stats["aggregate_tip_value_rideshare"], 2),
+        "aggregate_tip_percentage_rideshare": round(aggregate_stats["aggregate_tip_percentage_rideshare"]) if not np.isnan(aggregate_stats["aggregate_tip_percentage_rideshare"]) else 0,
+    }
+
+    # Cache the result
+    try:
+        cache.set(cache_key, pickle.dumps(result), timeout=3600)  # Cache for 1 hour
+    except RedisError as e:
+        app.logger.error(f"Failed to cache results: {e}")
+
+    return jsonify(result)
+
+def calculate_average_tip(df, tip_column):
+    if not df.empty:
+        return round(df[tip_column].sum() / len(df), 2)
+    return 0
+
+def calculate_tip_percentage(df):
+    if not df.empty:
+        df['tip_percentage'] = (df['income_tips'] / df['income_total_charge']) * 100
+        tip_percentage_mean = df['tip_percentage'].mean()
+        return round(tip_percentage_mean) if not pd.isna(tip_percentage_mean) else 0
+    return 0
 
 # --------------------------------------------------------------------------------
 
@@ -210,6 +204,7 @@ def average_pay_per_min():
     result = {
         "average_pay_per_minute_delivery": average_pay_per_minute_delivery,
         "average_pay_per_minute_rideshare": average_pay_per_minute_rideshare,
+        
         "aggregate_pay_per_minute_delivery": aggregate_pay_per_minute_delivery,
         "aggregate_pay_per_minute_rideshare": aggregate_pay_per_minute_rideshare,
     }
