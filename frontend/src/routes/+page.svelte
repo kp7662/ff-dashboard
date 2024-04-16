@@ -66,7 +66,7 @@ $: console.log('Affiliation in +page.svelte:', $selectedAffiliation);
     grid-rows-2 md:grid-cols-3 grid-rows-2 gap-3"
   >
     <RideshareSignUpsCard cardTitle="Total Drivers Sign-ups (Rideshare)" />
-    <AverageTipsPerRideshare cardTitle="Average Tips per Order (Rideshare)" />
+    <AverageTipsPerRideshare cardTitle="Average Tips per Ride (Rideshare)" />
     <AveragePayPerMinRideshare cardTitle="Average Pay per Minute (Rideshare)" />
 
     <DeliverySignUpsCard cardTitle="Total Drivers Sign-ups (Delivery)" />
