@@ -44,7 +44,7 @@ def delivery_data_route():
     # end_date = request.args.get('end_date')
     affiliation = request.args.get('affiliation')
 
-    delivery_df = get_delivery_data(date_filter='7d', start_date=None, end_date=None , affiliation=affiliation)
+    delivery_df = get_delivery_data(date_filter='3m', start_date=None, end_date=None , affiliation=affiliation)
     # delivery_df = get_delivery_data(date_filter=None, start_date='2024-01-01', end_date='2024-03-01')
     # Convert DataFrame to JSON or other desired format for the response
     delivery_data = delivery_df.to_dict(orient='records')
