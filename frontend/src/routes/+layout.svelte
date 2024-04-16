@@ -5,6 +5,13 @@
   import Navbar from "../lib/Navbar.svelte";
   import Footer from "../lib/Footer.svelte";
 
+  import { onMount } from 'svelte';
+
+  // Function to set background color on mount
+  onMount(() => {
+    document.body.style.backgroundColor = '#fcf8fb';
+  });
+
   let title = "FF Admin";
 
 </script>

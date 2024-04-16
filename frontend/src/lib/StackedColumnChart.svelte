@@ -58,7 +58,7 @@ onMount(async () => {
 </style>
 
 <div class="w-full">
-    <div class="flex flex-col items-center w-full bg-white rounded-lg shadow-xl p-4" style="min-height: 450px;">
+    <div class="flex flex-col items-center w-full bg-white rounded-lg shadow-xl p-4 font-sans" style="min-height: 450px;">
         <h2 class="text-xl font-bold">Avg. Income Breakdown by Category (Percentages)</h2>
         <span class="text-sm font-semibold text-gray-500">Live data from the database</span>
     <div class="flex items-end flex-grow w-full mt-2 space-x-2 sm:space-x-3">

@@ -1,6 +1,6 @@
 
 
-<footer class="bg-white rounded-lg shadow dark:bg-gray-800">
+<footer class="bg-fcf8fb rounded-lg shadow dark:bg-gray-800">
     <div class="w-full mx-auto max-w-screen-xl px-4 md:flex md:items-center md:justify-between">
       <span class="text-lg text-gray-500 dark:text-gray-400">© 2024 <a href="https://wao.cs.princeton.edu/" class="hover:underline">FairFare™</a>. All Rights Reserved.
       </span>

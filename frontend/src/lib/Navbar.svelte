@@ -1,6 +1,6 @@
 <!-- Code adapted from: https://flowbite.com/docs/components/navbar/ -->
 
-<nav class="bg-white border-gray-200 dark:bg-gray-900">
+<nav class="bg-fcf8fb border-gray-200 dark:bg-gray-900">
 <div class="flex flex-wrap items-center justify-between w-full mx-auto pl-2 pr-4">
         <a href="." class="flex items-center space-x-3 rtl:space-x-reverse">
         <img src="/fairfare_logo.png" class="h-16 pl-4" alt="Fairfare Logo">

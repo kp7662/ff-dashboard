@@ -39,7 +39,7 @@ $: console.log('Affiliation in +page.svelte:', $selectedAffiliation);
 </nav>
 
 
-<div class="border border-gray-200 rounded-lg p-4 mb-12">
+<div class="border border-gray-200 bg-white rounded-lg p-4 mb-12">
   <h2 class="mb-4 pl-4 text-3xl font-extrabold text-gray-900 dark:text-white md:text-4xl lg:text-5xl">
     Filters
   </h2>
@@ -56,8 +56,7 @@ $: console.log('Affiliation in +page.svelte:', $selectedAffiliation);
 </div>
 
 
-
-<div class="border border-gray-200 rounded-lg p-4 mb-12">
+<div class="border border-gray-200 bg-white rounded-lg p-4 mb-12">
   <h2 class="mb-12 pl-4 text-3xl font-extrabold text-gray-900 dark:text-white md:text-4xl lg:text-5xl">
     Live Stats
   </h2>
@@ -76,7 +75,7 @@ $: console.log('Affiliation in +page.svelte:', $selectedAffiliation);
   </div>
 </div>
 
-<div class="border border-gray-200 rounded-lg p-4 mb-12">
+<div class="border border-gray-200 bg-white rounded-lg p-4 mb-12">
   <h2 class="mb-12 pl-4 text-3xl font-extrabold text-gray-900 dark:text-white md:text-4xl lg:text-5xl">
     Charts Analysis
   </h2>
