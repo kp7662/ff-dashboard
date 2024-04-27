@@ -1,5 +1,5 @@
-<!-- https://flowbite.com/docs/plugins/datepicker/#date-range-picker -->
-<!-- frontend/src/lib/DateRangePicker.svelte -->
+<!-- The following code is adapted from: https://flowbite.com/docs/plugins/datepicker/#date-range-picker -->
+
 <script>
   import { onMount } from 'svelte';
   import { startDate, endDate } from '../lib/stores/store';
@@ -7,23 +7,16 @@
   let start = '';
   let end = '';
 
-  // Placeholder for potential date picker initialization
   onMount(() => {
-    // Initialize start and end dates from the store if available
     startDate.subscribe(value => {
       start = value;
-      // console.log('Start Date:', start);
     });
     endDate.subscribe(value => {
       end = value;
-      // console.log('End Date:', end);
     });
   });
 
-  // Example function to handle date changes
-  // Update based on the date picker library's API if using one
   function updateDateRange() {
-    // Logic to handle date range updates, e.g., ensuring start is before end
     if (new Date(start) > new Date(end)) {
       end = start;
     }

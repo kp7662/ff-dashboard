@@ -1,4 +1,3 @@
-<!-- frontend/src/routes/time/+page.svelte -->
 <script>
 import {
     Breadcrumb,

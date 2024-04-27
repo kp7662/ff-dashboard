@@ -1,4 +1,4 @@
-<!-- Code adapted from: https://flowbite.com/docs/components/footer/ -->
+<!-- The following code is adapted from: https://flowbite.com/docs/components/footer/ -->
 
 <footer class="bg-fcf8fb rounded-lg shadow dark:bg-gray-800">
     <div class="w-full mx-auto max-w-screen-xl px-4 md:flex md:items-center md:justify-between">

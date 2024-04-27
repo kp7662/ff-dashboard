@@ -8,7 +8,7 @@ $: console.log('Affiliation in +page.svelte:', $selectedAffiliation, testCounter
 
 function incrementCounter() {
     testCounter += 1;
-    selectedAffiliation.update(n => n); // This line doesn't change the value but should trigger subscribers.
+    selectedAffiliation.update(n => n);
 }
 </script>
 

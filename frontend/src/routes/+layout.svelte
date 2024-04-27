@@ -7,7 +7,6 @@
 
   import { onMount } from 'svelte';
 
-  // Function to set background color on mount
   onMount(() => {
     document.body.style.backgroundColor = '#fcf8fb';
   });

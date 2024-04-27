@@ -137,7 +137,6 @@ def get_rideshare_data(date_filter='3m', start_date=None, end_date=None, affilia
         else:
             raise ValueError("Invalid affiliation parameter. Options: 'CIDU', 'RDU', 'DU', 'CDU', 'DDA', 'Unaffiliated', 'All'")
 
-    # Cache the processed DataFrame
     try:
         # Cache the processed DataFrame
         cache.set(cache_key, df.to_json(orient='split'), timeout=30 * 24 * 3600) # TTL = One month
@@ -261,7 +260,6 @@ def get_delivery_data(date_filter='3m', start_date=None, end_date=None, affiliat
         else:
             raise ValueError("Invalid affiliation parameter. Options: 'CIDU', 'RDU', 'DU', 'CDU', 'DDA', 'Unaffiliated', 'All'")
 
-    # Cache the processed DataFrame
     try:
         # Cache the processed DataFrame
         cache.set(cache_key, df.to_json(orient='split'), timeout=30 * 24 * 3600) # TTL = One month
@@ -296,7 +294,6 @@ def get_aggregate_stats(start_date, end_date):
     delivery_df = get_delivery_data(start_date=start_date, end_date=end_date, affiliation='All')
     rideshare_df = get_rideshare_data(start_date=start_date, end_date=end_date, affiliation='All')
 
-    # Ensure income_total_charge is not zero to avoid division by zero errors for tip percentage calculation
     valid_delivery_df_for_tips = delivery_df[delivery_df['income_total_charge'] != 0]
     valid_rideshare_df_for_tips = rideshare_df[rideshare_df['income_total_charge'] != 0]
 
@@ -358,7 +355,6 @@ def get_aggregate_stats(start_date, end_date):
     }
 
     try:
-        # Cache the computed statistics
         cache.set(cache_key, pickle.dumps(aggregate_stats), timeout=3600)  # Cache for 1 hour
     except RedisError as e:
         logger.error(f"Failed to cache data: {e}")
@@ -381,13 +377,9 @@ def get_rideshare_pay_breakdown_df(date_filter='7d', start_date=None, end_date=N
     Returns:
     - DataFrame: A pandas DataFrame containing the rideshare payment breakdown.
     """
-    # Use the previously defined function to fetch rideshare data with caching
     df = get_rideshare_data(date_filter, start_date, end_date)
-
-    # Filter the DataFrame to include only the relevant columns for payment breakdown
     df = df[['id', 'income_fees', 'income_pay', 'income_tips', 'income_bonus']]
 
-    # Convert columns to float, ensuring any non-numeric entries are handled gracefully
     for column in ['income_fees', 'income_pay', 'income_tips', 'income_bonus']:
         df[column] = pd.to_numeric(df[column], errors='coerce').fillna(0.0).astype(float)
 
@@ -409,13 +401,9 @@ def get_delivery_pay_breakdown_df(date_filter='7d', start_date=None, end_date=No
     Returns:
     - DataFrame: A pandas DataFrame containing the rideshare payment breakdown.
     """
-    # Use the previously defined function to fetch rideshare data with caching
     df = get_delivery_data(date_filter, start_date, end_date)
-
-    # Filter the DataFrame to include only the relevant columns for payment breakdown
     df = df[['id', 'income_fees', 'income_pay', 'income_tips', 'income_bonus']]
 
-    # Convert columns to float, ensuring any non-numeric entries are handled gracefully
     for column in ['income_fees', 'income_pay', 'income_tips', 'income_bonus']:
         df[column] = pd.to_numeric(df[column], errors='coerce').fillna(0.0).astype(float)
 
@@ -433,10 +421,10 @@ def load_json_safe(x):
     try:
         return json.loads(x)
     except json.JSONDecodeError as e:
-        print(f"JSONDecodeError for: {x} - Error: {e}")  # Log error and problematic string
+        print(f"JSONDecodeError for: {x} - Error: {e}") 
         return {}
     except TypeError as e:
-        print(f"TypeError for: {x} - Error: {e}")  # Log error and problematic string
+        print(f"TypeError for: {x} - Error: {e}")
         return {}
     
 # --------------------------------------------------------------------------------
@@ -553,7 +541,7 @@ def prepare_data(df):
         ]
     )
 
-    df["value"] = df["value"].astype(float) / 100  # Scale down if values were too large
+    df["value"] = df["value"].astype(float) / 100
     df.replace([np.inf, -np.inf], np.nan, inplace=True)
     df.dropna(subset=["value"], inplace=True)
 
@@ -603,19 +591,6 @@ def create_plot(df):
 # Some unused functions (for now)
 
 def get_rideshare_avg_trip_duration():
-    """
-    Retrieves the average trip duration of rideshare activities from cache or, if not available, computes it from
-    database records. This value is then cached for future requests.
-
-    Initially, the function checks for the average trip duration in the cache. If found, it logs the retrieval time
-    and returns the cached value. If the average trip duration is not in the cache (cache miss), the function queries
-    the database for all rideshare trip durations, computes the average, logs the time taken for database operations
-    and the overall operation time, including caching. The computed average trip duration is then cached with a set
-    timeout and returned.
-
-    Returns:
-    - float: The average trip duration for rideshare activities.
-    """
     cache_key = 'avg_trip_duration'
     start_time = time.time()
 
@@ -643,7 +618,6 @@ def get_rideshare_avg_trip_duration():
     db_duration = time.time() - start_db_time  # Calculate the duration of database operation
     logger.info(f"Loaded data from database and computed average in {db_duration:.4f} seconds.")
 
-    # Cache the computed average for future requests
     cache.set(cache_key, average_trip_duration, timeout=3600)  # Cache for 1 hour
     
     total_duration = time.time() - start_time  # Total operation time including caching
@@ -654,35 +628,16 @@ def get_rideshare_avg_trip_duration():
 # --------------------------------------------------------------------------------
 
 def get_rideshare_monthly_pay():
-    """
-    Retrieves rideshare monthly pay data, either from cache or by querying the database, then returns it as a DataFrame.
-    
-    This function first attempts to retrieve the data from cache. If successful (cache hit), it logs the retrieval time,
-    deserializes the JSON string to a DataFrame, and returns it. If the data is not in the cache (cache miss), it logs
-    this event, executes a database query to fetch rideshare payment data (limited to the first 2000 records for
-    performance reasons), and preprocesses the data by calculating total charges and current pay excluding tips.
-    
-    After preprocessing, the DataFrame is converted to a JSON string and cached for future requests with a set timeout.
-    The function logs the duration it takes to load data from the database and cache it. Finally, it returns the
-    DataFrame containing the preprocessed rideshare monthly pay data.
-    
-    Returns:
-    - DataFrame: A pandas DataFrame containing rideshare monthly pay data, including total charges and current pay,
-    preprocessed for further analysis.
-    """
     cache_key = 'get_rideshare_monthly_pay'
     start_time = time.time()  # Start timing
 
     cached_data = cache.get(cache_key)
     
     if cached_data:
-        # If there's a cache hit, log it and load the DataFrame from the cached JSON
-        # Use StringIO to wrap the JSON string
         df = pd.read_json(StringIO(cached_data), orient='split')
         duration = time.time() - start_time  # Calculate the duration
         logger.info(f"Cache hit for {cache_key}. Loaded data from cache in {duration:.2f} seconds.")
     else:
-        # If there's a cache miss, log it, query the database, and cache the result
         logger.info(f"Cache miss for {cache_key}. Querying database...")
         
         # Database query to retrieve rideshare data

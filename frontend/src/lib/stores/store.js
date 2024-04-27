@@ -26,20 +26,3 @@ function createAdminDashStore() {
 }
 
 export const AdminDashStore = createAdminDashStore();
-
-
-
-//////////////////////////
-// export const gigsWithFareTake = derived(adminDash, ($a) => {
-//   const activities = $a.allActivities;
-//   return getFilteredGigsWithNonNaNTakeRates(activities);
-// });
-
-// export const gigStats = derived(gigsWithFareTake, ($gigs) => {
-//   return {
-//     takeRatePct: _.meanBy($gigs, (x) => x.take_rate),
-//     takeRateValue: averageFareTakeValue($gigs),
-//     takeRateVariability: variabilityOfFareTake($gigs),
-//     avgAndVariabilityPerDriver: averageAndVariabilityPerDriver($gigs)
-//   };
-// });

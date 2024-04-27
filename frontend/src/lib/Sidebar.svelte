@@ -1,4 +1,3 @@
-<!-- frontend/src/lib/Sidebar.svelte -->
 <script>
   import { Nav, Collapse } from "@sveltestrap/sveltestrap";
   import { goto } from '$app/navigation';

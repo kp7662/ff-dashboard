@@ -6,10 +6,9 @@
     let displayTimeout;
 
 function showDetail(payItem) {
-    clearTimeout(displayTimeout); // Clear any existing timeout to avoid premature hiding
+    clearTimeout(displayTimeout);
     selectedDetail = payItem;
 
-    // Set a timeout to clear the selectedDetail after 3 seconds (3000 milliseconds)
     displayTimeout = setTimeout(() => {
         selectedDetail = null;
     }, 3000);
@@ -32,7 +31,7 @@ onMount(async () => {
         categories = fetchedData.map(category => {
             const totalIncome = category.pay.reduce((sum, payItem) => sum + payItem.amount, 0);
             const payWithPercentages = category.pay.map(payItem => ({
-                type: payItem.type, // Retain the type of each income breakdown
+                type: payItem.type,
                 amount: (payItem.amount / totalIncome) * 100, // Convert amount to percentage of total
                 color: colorMap[payItem.type] || 'bg-gray-400' // Map type to a color, fallback to gray
             }));
@@ -57,11 +56,10 @@ onMount(async () => {
     }
 </style>
 
-<div class="w-full">
-    <div class="flex flex-col items-center w-full bg-white rounded-lg shadow-xl p-4 font-sans" style="min-height: 450px;">
-        <h2 class="text-xl font-bold">Avg. Income Breakdown by Category (Percentages)</h2>
-        <span class="text-sm font-semibold text-gray-500">Live data from the database</span>
-    <div class="flex items-end flex-grow w-full mt-2 space-x-2 sm:space-x-3">
+<div class="w-full flex flex-col items-center justify-center bg-white rounded-lg shadow-xl p-4 font-sans" style="min-height: 450px;">
+    <h2 class="text-xl font-bold">Avg. Income Breakdown by Category (Percentages)</h2>
+    <span class="text-sm font-semibold text-gray-500">Live data from the database</span>
+    <div class="flex items-center justify-center flex-grow w-full mt-2 space-x-2 sm:space-x-3">
         {#each categories as { name, pay }}
             <div class="flex flex-col items-center w-full">
                 <div class="relative flex flex-col items-center w-full h-64">
@@ -93,5 +91,4 @@ onMount(async () => {
         <div class="flex items-center"><div class="w-4 h-4 bg-blue-500"></div><span class="ml-2">Income Bonus</span></div>
         <div class="flex items-center"><div class="w-4 h-4 bg-yellow-500"></div><span class="ml-2">Income Fees</span></div>
     </div>
-</div>
 </div>

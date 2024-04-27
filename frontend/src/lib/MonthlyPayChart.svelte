@@ -1,4 +1,4 @@
-<!-- https://svelte.dev/repl/3ad4a548a4c442b69f20c25021ac8fbf?version=4.1.0 -->
+<!-- The following code is adapted from: https://svelte.dev/repl/3ad4a548a4c442b69f20c25021ac8fbf?version=4.1.0 -->
 
 <script>
   import { onMount, afterUpdate} from 'svelte';
@@ -10,9 +10,9 @@
   let height = 700 * 3;
   let marginTop = 80 * 3;
   let marginRight = 30;
-  let marginBottom = 150 * 1.5; // Increased margin for better label visibility
-  let marginLeft = 200 * 1.5 + 100; // Increased margin and added padding for y-axis label visibility
-  let xAxisLabelPadding = 60; // Padding between x-axis labels and x-axis line
+  let marginBottom = 150 * 1.5;
+  let marginLeft = 200 * 1.5 + 100;
+  let xAxisLabelPadding = 60;
 
   // Function to fetch data from the backend
   // Uncomment this to revert changes
@@ -35,7 +35,7 @@
   // Function to fetch data based on affiliation
   export let affiliation;
 
-  let error = ''; // State for storing potential fetch errors
+  let error = '';
 
   async function fetchData() {
       console.log(`Fetching data for affiliation: ${affiliation}`);
@@ -49,7 +49,7 @@
           console.log('Data fetched successfully:', data);
       } catch (err) {
           console.error('Error fetching data:', err);
-          error = err.message; // Update error state
+          error = err.message;
       }
   }
 

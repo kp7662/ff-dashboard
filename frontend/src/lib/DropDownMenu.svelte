@@ -7,7 +7,7 @@ import { selectedAffiliation } from '../lib/stores/store';
 import { onMount } from 'svelte';
 
 // Local component state for the selected affiliation label
-let selectedAffiliationLabel = 'CIDU';
+let selectedAffiliationLabel = 'Colorado Independent Drivers United';
 
 // Function to handle affiliation selection
 function handleAffiliationChange(event) {
@@ -42,19 +42,19 @@ onMount(() => {
 <div id="dropdownHover" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-64 dark:bg-gray-700">
     <ul class="py-2 text-base text-gray-700 dark:text-gray-200" aria-labelledby="dropdownHoverButton">
         <li>
-            <button data-affiliation="CIDU" on:click={handleAffiliationChange} class="block px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full text-left">CIDU</button>
+            <button data-affiliation="CIDU" on:click={handleAffiliationChange} class="block px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full text-left">Colorado Independent Drivers United</button>
         </li>
         <li>
-            <button data-affiliation="RDU" on:click={handleAffiliationChange} class="block px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full text-left">RDU</button>
+            <button data-affiliation="RDU" on:click={handleAffiliationChange} class="block px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full text-left">Rideshare Drivers United</button>
         </li>
         <li>
-            <button data-affiliation="DU" on:click={handleAffiliationChange} class="block px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full text-left">DU</button>
+            <button data-affiliation="DU" on:click={handleAffiliationChange} class="block px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full text-left">Drivers United</button>
         </li>
         <li>
-            <button data-affiliation="CDU" on:click={handleAffiliationChange} class="block px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full text-left">CDU</button>
+            <button data-affiliation="CDU" on:click={handleAffiliationChange} class="block px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full text-left">Connecticut Drivers United</button>
         </li>
         <li>
-            <button data-affiliation="DDA" on:click={handleAffiliationChange} class="block px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full text-left">DDA</button>
+            <button data-affiliation="DDA" on:click={handleAffiliationChange} class="block px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full text-left">DMV Drivers Alliance</button>
         </li>
         <li>
             <button data-affiliation="Unaffiliated" on:click={handleAffiliationChange} class="block px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full text-left">Unaffiliated</button>

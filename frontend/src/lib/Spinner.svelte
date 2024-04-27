@@ -1,12 +1,11 @@
+<!-- The following code is adapted from https://flowbite.com/docs/components/spinner/ -->
+
 <script>
     import { selectedAffiliation, startDate, endDate, showSpinner } from '../lib/stores/store';
   
-    // Function to show the spinner for 3 seconds when any of the selected variables change
     const showSpinnerFor5Seconds = () => {
-    //   console.log("Variable(s) changed, showing spinner...");
       showSpinner.set(true);
       setTimeout(() => {
-        // console.log("Hiding spinner after 5 seconds...");
         showSpinner.set(false);
       }, 5000);
     };

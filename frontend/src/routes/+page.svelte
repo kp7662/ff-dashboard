@@ -1,25 +1,23 @@
 <!-- frontend/src/routes/+page.svelte -->
 <script>
-import StackedColumnChart from "../lib/StackedColumnChart.svelte";
-import ViolinPlot from "../lib/ViolinPlot.svelte";
-import Spinner from "../lib/Spinner.svelte";
-import DropDownMenu from "../lib/DropDownMenu.svelte";
-import DateRangePicker from "../lib/DateRangePicker.svelte"
-import RideshareSignUpsCard from "../lib/RideshareSignUpsCard.svelte";
-import DeliverySignUpsCard from "../lib/DeliverySignUpsCard.svelte";
-import AverageTipsPerDelivery from "../lib/AverageTipsPerDeliveryCard.svelte"
-import AverageTipsPerRideshare from "../lib/AverageTipsPerRideshareCard.svelte"
-import AveragePayPerMinDelivery from "../lib/AveragePayPerMinDeliveryCard.svelte"
-import AveragePayPerMinRideshare from "../lib/AveragePayPerMinRideshareCard.svelte"
+  import StackedColumnChart from "../lib/StackedColumnChart.svelte";
+  import ViolinPlot from "../lib/ViolinPlot.svelte";
+  import Spinner from "../lib/Spinner.svelte";
+  import DropDownMenu from "../lib/DropDownMenu.svelte";
+  import DateRangePicker from "../lib/DateRangePicker.svelte"
+  import RideshareSignUpsCard from "../lib/RideshareSignUpsCard.svelte";
+  import DeliverySignUpsCard from "../lib/DeliverySignUpsCard.svelte";
+  import AverageTipsPerDelivery from "../lib/AverageTipsPerDeliveryCard.svelte"
+  import AverageTipsPerRideshare from "../lib/AverageTipsPerRideshareCard.svelte"
+  import AveragePayPerMinDelivery from "../lib/AveragePayPerMinDeliveryCard.svelte"
+  import AveragePayPerMinRideshare from "../lib/AveragePayPerMinRideshareCard.svelte"
 
-import { Card, CardBody } from "@sveltestrap/sveltestrap";
+  import { Card, CardBody } from "@sveltestrap/sveltestrap";
 
-import { selectedAffiliation } from '../lib/stores/store';
+  import { selectedAffiliation } from '../lib/stores/store';
 
-let title = "FF Admin Dashboard";
+  let title = "FF Admin Dashboard";
 
-// Auto-subscribe to the store for console log.
-// $: console.log('Affiliation in +page.svelte:', $selectedAffiliation);
 </script>
 
 <svelte:head>
@@ -60,7 +58,6 @@ let title = "FF Admin Dashboard";
     </h2>
     <Spinner />
   </div>
-
   <div
     class="grid grid-cols-1
     grid-rows-2 md:grid-cols-3 grid-rows-2 gap-3"
@@ -77,7 +74,7 @@ let title = "FF Admin Dashboard";
 
 <div class="border border-gray-200 bg-white rounded-lg p-4 mb-12">
   <h2 class="mb-12 pl-4 text-3xl font-extrabold text-gray-900 dark:text-white md:text-4xl lg:text-5xl">
-    Charts Analysis
+    Aggregate Data Analysis Charts
   </h2>
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-3">

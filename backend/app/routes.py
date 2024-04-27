@@ -33,9 +33,10 @@ def rideshare_data_route():
 
     rideshare_df = get_rideshare_data(date_filter='3m', start_date=None, end_date=None , affiliation=affiliation)
     # rideshare_df = get_rideshare_data(date_filter=None, start_date='2024-01-01', end_date='2024-03-01')
-    # Convert DataFrame to JSON or other desired format for the response
     rideshare_data = rideshare_df.to_dict(orient='records')
     return jsonify({"rideshare_data": rideshare_data})
+
+# --------------------------------------------------------------------------------
 
 @app.route('/delivery-data')
 def delivery_data_route():
@@ -45,7 +46,6 @@ def delivery_data_route():
 
     delivery_df = get_delivery_data(date_filter='3m', start_date=None, end_date=None , affiliation=affiliation)
     # delivery_df = get_delivery_data(date_filter=None, start_date='2024-01-01', end_date='2024-03-01')
-    # Convert DataFrame to JSON or other desired format for the response
     delivery_data = delivery_df.to_dict(orient='records')
     return jsonify({"delivery_data": delivery_data})
 
@@ -61,7 +61,6 @@ def rideshare_sign_ups():
     end_date = request.args.get('end_date')
     affiliation = request.args.get('affiliation')
 
-    # Call get_rideshare_data() function with the affiliation, start_date, and end_date parameters
     rideshare_df = get_rideshare_data(date_filter='3m', start_date=start_date, end_date=end_date, affiliation=affiliation)
     rideshare_data = rideshare_df.to_dict(orient='records')
 
@@ -84,7 +83,6 @@ def delivery_sign_ups():
     end_date = request.args.get('end_date')
     affiliation = request.args.get('affiliation')
 
-    # Call get_delivery_data() function with the affiliation, start_date, and end_date parameters
     delivery_df = get_delivery_data(date_filter='3m', start_date=start_date, end_date=end_date, affiliation=affiliation)
     delivery_data = delivery_df.to_dict(orient='records')
 
@@ -105,7 +103,6 @@ def average_tips_per_delivery():
 
     cache_key = f"average-tips-per-delivery_{affiliation}_{start_date}_{end_date}"
 
-    # Attempt to fetch cached results
     try:
         cached_results = cache.get(cache_key)
         if cached_results:
@@ -167,7 +164,6 @@ def average_pay_per_min():
 
     cache_key = f"average-pay-per-min_{affiliation}_{start_date}_{end_date}"
     
-    # Attempt to fetch cached results
     try:
         cached_results = cache.get(cache_key)
         if cached_results:
@@ -226,7 +222,7 @@ def pay_breakdown():
     # rideshare_df = get_rideshare_pay_breakdown_df(date_filter=None, start_date='2023-12-01', end_date='2024-03-01')
     # delivery_df = get_delivery_pay_breakdown_df(date_filter=None, start_date='2023-12-01', end_date='2024-03-01')
 
-    # Calculate the average for each numeric column
+    # Calculate the average for each column
     rideshare_avg = rideshare_df[['income_fees', 'income_pay', 'income_tips', 'income_bonus']].mean().to_dict()
     delivery_avg = delivery_df[['income_fees', 'income_pay', 'income_tips', 'income_bonus']].mean().to_dict()
 
@@ -252,7 +248,6 @@ def pay_breakdown():
         }
     ]
 
-    # Return the data as JSON
     return jsonify(data)
 
 # --------------------------------------------------------------------------------
@@ -284,17 +279,11 @@ def rideshare_monthly_pay():
     # Formula to calculate monthly average pay:
     rideshare_df['datetime'] = pd.to_datetime(rideshare_df['start_datetime'])
     rideshare_df['current_pay'] = pd.to_numeric(rideshare_df['current_pay'], errors='coerce')
-
-    # Create a new column 'year_month' to store the year and month of each ride
     rideshare_df['year_month'] = rideshare_df['datetime'].dt.to_period('M')
 
-    # Calculate monthly average pay
     monthly_average_pay = rideshare_df.groupby('year_month')['current_pay'].mean().reset_index()
-
-    # Convert year_month to string for better readability in the JSON response
     monthly_average_pay['year_month'] = monthly_average_pay['year_month'].astype(str)
 
-    # Convert DataFrame to dictionary for JSON response
     result = monthly_average_pay.to_dict(orient='records')
 
     return jsonify({"monthly_average_pay": result})
@@ -305,7 +294,6 @@ def rideshare_monthly_pay():
 
 @app.route('/trips-per-driver-chart')
 def trips_per_account_chart():
-    # Fetch and preprocess the rideshare data
     rideshare_df = get_rideshare_data(date_filter='1m', start_date=None, end_date=None)
     
     # Get the number of trips per account
@@ -346,15 +334,12 @@ colors = ['darkred', 'blue', 'green', 'purple', 'orange',
 # Code adapted from: https://github.com/Princeton-HCI/ff-analysis/blob/main/workflow/notebooks/analyses/initial-exploration.qmd
 @app.route('/rideshare/<user_id>/map', methods=['GET'])
 def generate_map_for_user(user_id, date_filter='1m', start_date=None, end_date=None):
-    # Fetch data using the get_rideshare_data function
     df = get_rideshare_data(date_filter, start_date, end_date)
 
-    # Filter the DataFrame for the specific user and conditions
     df_filtered = df[(df['user'] == user_id) &
                      (df['income_fees'] > 0) &
                      (df['income_total_charge'] > 0)].copy()
     
-    # Sort by start_datetime
     df_filtered.sort_values(by='start_datetime', ascending=False, inplace=True)
 
     # Calculate take_rate
@@ -376,7 +361,6 @@ def generate_map_for_user(user_id, date_filter='1m', start_date=None, end_date=N
             end_lat = float(item['end_location_lat'])
             end_lng = float(item['end_location_lng'])
 
-            # Only proceed if all coordinates are valid
             start_coords = (start_lat, start_lng)
             end_coords = (end_lat, end_lng)
 
@@ -417,13 +401,11 @@ def affiliations():
 
     df_user_metadata['affiliations_list'] = df_user_metadata['raw_user_meta_data'].apply(lambda x: x.get('affiliation', []) if isinstance(x, dict) else [])
 
-    # Apply cleaning logic to affiliations
     cleaned_affiliations = df_user_metadata['affiliations_list'].apply(clean_user_affiliations)
     
     # Assume each user only has one affiliation for simplicity
     df_user_metadata['cleaned_affiliation'] = cleaned_affiliations.apply(lambda x: x[0] if x else 'unaffiliated')
 
-    # Prepare and return JSON response
     response_data = [
         {"argyle_account": row["argyle_account"], "cleaned_affiliation": row["cleaned_affiliation"]}
         for _, row in df_user_metadata.iterrows()

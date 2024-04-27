@@ -1,7 +1,6 @@
 <script>
     import { selectedAffiliation } from '../lib/stores/store';
 
-    // Function to update the store
     function updateAffiliation(newAffiliation) {
         selectedAffiliation.set(newAffiliation);
     }

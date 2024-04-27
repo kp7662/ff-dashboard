@@ -1,4 +1,4 @@
-// https://github.com/consultingninja/svelteTemplateProject/blob/main/src/url.js
+// The following code is adapted from: https://github.com/consultingninja/svelteTemplateProject/blob/main/src/url.js
 
 import { derived,writable } from "svelte/store";
 

@@ -3,24 +3,18 @@
     import { selectedAffiliation, startDate, endDate } from '../lib/stores/store';
     
     export let cardTitle = "";
-    let average_pay_per_minute_rideshare = 'Loading...'; // Placeholder text while fetching data
-    let aggregate_pay_per_minute_rideshare = 'Loading...'; // Placeholder for the last updated time
+    let average_pay_per_minute_rideshare = 'Loading...';
+    let aggregate_pay_per_minute_rideshare = 'Loading...';
     
     const fetchData = async () => {
-        const affiliation = $selectedAffiliation; // Get the selected affiliation from the store
-        const start = $startDate; // Get the selected start date from the store
-        const end = $endDate; // Get the selected end date from the store
-        // console.log("Fetching data for affiliation:", affiliation);
-        // console.log("Start Date:", start);
-        // console.log("End Date:", end);
+        const affiliation = $selectedAffiliation;
+        const start = $startDate;
+        const end = $endDate;
         const url = `http://localhost:5000/average-pay-per-min?affiliation=${affiliation}&start_date=${start}&end_date=${end}`; // Construct the URL with the selected affiliation, start_date, and end_date
-        // console.log("URL:", url);
-        const response = await fetch(url); // Fetch data from the constructed URL
+        const response = await fetch(url);
         const data = await response.json();
-        // console.log("Received data:", data);
-        average_pay_per_minute_rideshare = `USD ${data.average_pay_per_minute_rideshare}`;
-        // console.log("average_pay_per_min: ", average_pay_per_minute_rideshare);
-        aggregate_pay_per_minute_rideshare = `USD ${data.aggregate_pay_per_minute_rideshare}`;
+        average_pay_per_minute_rideshare = `$ ${data.average_pay_per_minute_rideshare}`;
+        aggregate_pay_per_minute_rideshare = `$ ${data.aggregate_pay_per_minute_rideshare}`;
     };
     
     // Fetch data initially when the component is mounted
@@ -28,9 +22,6 @@
     
     // Watch for changes in the selected affiliation, start_date, and end_date and update totalSignUps accordingly
     $: {
-        // console.log("Selected affiliation changed:", $selectedAffiliation);
-        // console.log("Start Date changed:", $startDate);
-        // console.log("End Date changed:", $endDate);
         $selectedAffiliation;
         $startDate;
         $endDate;
@@ -47,14 +38,11 @@
     <div class="text-5xl font-bold my-3">
         <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-emerald-600">{average_pay_per_minute_rideshare}</span>
     </div>
-
-    <!-- Display aggregate value for comparison -->
     <div class="flex justify-between items-center mb-2 text-base">
     <div>Average Pay per Minute (Overall)</div>
     <div class="flex items-center text-green-500 text-base">
         {aggregate_pay_per_minute_rideshare}
     </div>
     </div>
-
 </CardBody>
 </Card>
